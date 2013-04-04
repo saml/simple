@@ -27,6 +27,7 @@ try:
 except ImportError:
     pygments = None
 
+
 app = Flask(__name__)
 app.config.from_object('settings')
 app.secret_key = app.config["SECRET_KEY"]
@@ -67,7 +68,7 @@ class Post(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String())
-    slug = db.Column(db.String(), unique=True)
+    slug = db.Column(db.String(), index=True, unique=True)
     text = db.Column(db.String(), default="")
     draft = db.Column(db.Boolean(), index=True, default=True)
     views = db.Column(db.Integer(), default=0)
