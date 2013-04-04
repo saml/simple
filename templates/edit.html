@@ -12,12 +12,19 @@
             window.ondrop = function(e) {e.preventDefault(); upload(e.dataTransfer.files); };
 
             function upload(files) {
+                var now = new Date();
+
+                // YYYY/MM
+                var destFolder = (new Date()).toISOString().split("-").slice(0,2).join("/");
+
                 $("#upload_list").empty();
                 $(files).each(function(i,file){
-                    if (!file || !file.type.match(/image.*/)) return;
+                    if (!file) return;
 
                     var fd = new FormData();
                     fd.append("file", file);
+                    fd.append("dest", destFolder);
+                    
                     var xhr = new XMLHttpRequest();
                     xhr.open("POST", "/upload");
                     xhr.onload = function() {
@@ -214,7 +221,7 @@
                     <div class="span3">
                         <div id="drop-upload" class=" well well-small" style="word-wrap: break-word;">
                             Drag files here to upload. Click to insert.
-                            <input style="visibility: collapse; width: 0px;" type="file" onchange="upload(this.files[0])">
+                            <input type="file" onchange="upload(this.files[0])">
                             <div id="upload_list"></div>
                         </div>
                     </div>

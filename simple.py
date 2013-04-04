@@ -19,6 +19,7 @@ from werkzeug.contrib.cache import FileSystemCache, NullCache
 from werkzeug.utils import secure_filename
 import json
 from flask import send_from_directory
+from unidecode import unidecode
 
 try:
     import pygments
@@ -31,7 +32,7 @@ app.config.from_object('settings')
 app.secret_key = app.config["SECRET_KEY"]
 
 UPLOAD_FOLDER = 'uploads/'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'ogg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -44,13 +45,13 @@ except Exception, e:
     print "Error: %s" % e
     cache = NullCache()
 
-_punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
+_punct_re = re.compile(r'\W+')
 
 extensions = ['fenced_code', 'toc']
 if pygments is not None:
     extensions.append('codehilite')
 
-MARKDOWN_PARSER = markdown.Markdown(extensions=extensions,
+MARKDOWN_PARSER = markdown.Markdown(extensions=extensions, safe_mode=False,
                                     output_format="html5")
 
 
@@ -58,7 +59,7 @@ class Post(db.Model):
     def __init__(self, title=None, created_at=None):
         if title:
             self.title = title
-            self.slug = slugify(title)
+            self.slug = unique_slugify(title)
         if created_at:
             self.created_at = created_at
             self.updated_at = created_at
@@ -213,7 +214,7 @@ def edit(post_id):
     else:
         if post.title != request.form.get("post_title", ""):
             post.title = request.form.get("post_title", "")
-            post.slug = slugify(post.title)
+            post.slug = unique_slugify(post.title)
 
         post.set_content(request.form.get("post_content", ""))
         post.updated_at = datetime.datetime.now()
@@ -267,7 +268,7 @@ def save_post(post_id):
         return abort(404)
     if post.title != request.form.get("title", ""):
         post.title = request.form.get("title", "")
-        post.slug = slugify(post.title)
+        post.slug = unique_slugify(post.title)
     content = request.form.get("content", "")
     content_changed = content != post.get_content()
 
@@ -292,7 +293,7 @@ def preview(post_id):
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route("/upload", methods=["POST"])
@@ -301,17 +302,21 @@ def upload_file():
     if request.method == 'POST':
         file_upload = request.files['file']
         if file and allowed_file(file_upload.filename):
-            filename = secure_filename(file_upload.filename)
-            key = b32encode(urandom(5))
-            filename, extension = os.path.splitext(filename)
-            filename = filename + '_' + key + extension
-            file_upload.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            url = url_for('uploaded_file', filename=filename)
+            dest_prefix = request.form.get('dest', '').strip('/')
+            dest_dir = os.path.join(app.config['UPLOAD_FOLDER'], dest_prefix)
+            if not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
+            filename, extension = os.path.splitext(file_upload.filename)
+            extension = slugify(extension[1:] if extension.startswith('.') else extension)
+            filename = '%s.%s' % (slugify(filename), extension)
+
+            file_upload.save(os.path.join(dest_dir, filename))
+            url = url_for('uploaded_file', filename=os.path.join(dest_prefix, filename))
             return json.dumps({'status': 'ok', 'url': url, 'name': filename})
     return 'ok'
             
 
-@app.route('/uploads/<filename>')
+@app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
@@ -329,19 +334,21 @@ def feed():
     return response
 
 
-def slugify(text, delim=u'-'):
-    """Generates an slightly worse ASCII-only slug."""
-    result = []
-    for word in _punct_re.split(text.lower()):
-        word = normalize('NFKD', unicode(word))
-        if word:
-            result.append(word)
-    slug = delim.join(result)
+def slugify(text, delim=u'-', encoding='utf-8'):
+    """Generates an slightly worse ASCII-only slug.
+    text should be unicode
+    """
+    if type(text) != type(u''):
+        text = unicode(text, encoding=encoding)
+    return _punct_re.sub(delim, unidecode(text).lower())
+
+def unique_slugify(text):
+    slug = slugify(text)
     # This could have issues if a post is marked as draft, then live, then 
     # draft, then live and there are > 1 posts with the same slug. Oh well.
     count = db.session.query(Post).filter_by(slug=slug).count()
     if count > 0:
-        return "%s%s%s" % (slug, delim, count)
+        return "%s-%d" % (slug, count)
     else:
         return slug
 
