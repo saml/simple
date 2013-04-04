@@ -66,20 +66,20 @@ class Post(db.Model):
             self.updated_at = created_at
 
     __tablename__ = "posts"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String())
     readable_id = db.Column(db.String(), index=True, unique=True)
     text = db.Column(db.String(), default="")
     draft = db.Column(db.Boolean(), index=True, default=True)
-    views = db.Column(db.Integer(), default=0)
-    created_at = db.Column(db.DateTime, index=True)
-    updated_at = db.Column(db.DateTime)
+    text_type = db.Column(db.String(), default='markdown')
+    created_at = db.Column(db.DateTime(), index=True)
+    updated_at = db.Column(db.DateTime())
 
     def render_content(self):
         _cached = cache.get("post_%s"%self.id)
         if _cached is not None:
             return _cached
-        text = MARKDOWN_PARSER.convert(self.text)
+        text = MARKDOWN_PARSER.convert(self.text) if self.text_type == 'markdown' else self.text
         cache.set("post_%s"%self.id, text)
         return text
 
@@ -160,11 +160,6 @@ def view_post(post_id):
     except Exception:
         return abort(404)
 
-    db.session.query(Post)\
-        .filter_by(id=post_id)\
-        .update({Post.views:Post.views + 1})
-    db.session.commit()
-
     return render_template("view.html", post=post, is_admin=is_admin())
 
 
@@ -175,15 +170,6 @@ def view_post_slug(readable_id):
     except Exception:
         #TODO: Better exception
         return abort(404)
-
-    if not any(botname in request.user_agent.string for botname in
-        ['Googlebot',  'Slurp',         'Twiceler',     'msnbot',
-         'KaloogaBot', 'YodaoBot',      '"Baiduspider',
-         'googlebot',  'Speedy Spider', 'DotBot']):
-        db.session.query(Post)\
-            .filter_by(readable_id=readable_id)\
-            .update({Post.views:Post.views+1})
-        db.session.commit()
 
     pid = request.args.get("pid", "0")
     return render_template("view.html", post=post, pid=pid, is_admin=is_admin())
