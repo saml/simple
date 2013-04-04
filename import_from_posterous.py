@@ -17,7 +17,7 @@ def read_to_post(src_path):
 		embed = body.find('div', class_='p_audio_embed')
 		if embed:
 			href = embed.a.get('href')
-			href = '/uploads' + href[href.find('/audio/'):]
+			href = '/uploads/posterous' + href[href.find('/audio/'):]
 			mp3 = soup.new_tag('a', href=href)
 			mp3.string = 'Download'
 			embed.a.replace_with(mp3)
