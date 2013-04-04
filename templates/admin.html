@@ -49,7 +49,7 @@
                 <h3>
                     <a href="{{ url_for('edit', post_id=post.id) }}">{{ post.title }}</a>
                         <span class="links">
-                            <a href="{{ url_for('view_post_slug', slug=post.slug) }}" class="admin-view">view</a>
+                            <a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}" class="admin-view">view</a>
                             <a href="{{ url_for('delete', post_id=post.id) }}" class="admin-delete" data-confirm="Are you sure?"
                                data-method="delete" rel="nofollow">x</a>
                         </span>

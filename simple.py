@@ -57,10 +57,10 @@ MARKDOWN_PARSER = markdown.Markdown(extensions=extensions, safe_mode=False,
 
 
 class Post(db.Model):
-    def __init__(self, title=None, created_at=None):
+    def __init__(self, title, created_at):
         if title:
             self.title = title
-            self.slug = unique_slugify(title)
+            self.readable_id = get_readable_id(created_at, title)
         if created_at:
             self.created_at = created_at
             self.updated_at = created_at
@@ -68,7 +68,7 @@ class Post(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String())
-    slug = db.Column(db.String(), index=True, unique=True)
+    readable_id = db.Column(db.String(), index=True, unique=True)
     text = db.Column(db.String(), default="")
     draft = db.Column(db.Boolean(), index=True, default=True)
     views = db.Column(db.Integer(), default=0)
@@ -168,10 +168,10 @@ def view_post(post_id):
     return render_template("view.html", post=post, is_admin=is_admin())
 
 
-@app.route("/<slug>")
-def view_post_slug(slug):
+@app.route("/<path:readable_id>")
+def view_post_slug(readable_id):
     try:
-        post = db.session.query(Post).filter_by(slug=slug, draft=False).one()
+        post = db.session.query(Post).filter_by(readable_id=readable_id, draft=False).one()
     except Exception:
         #TODO: Better exception
         return abort(404)
@@ -181,7 +181,7 @@ def view_post_slug(slug):
          'KaloogaBot', 'YodaoBot',      '"Baiduspider',
          'googlebot',  'Speedy Spider', 'DotBot']):
         db.session.query(Post)\
-            .filter_by(slug=slug)\
+            .filter_by(readable_id=readable_id)\
             .update({Post.views:Post.views+1})
         db.session.commit()
 
@@ -213,13 +213,10 @@ def edit(post_id):
     if request.method == "GET":
         return render_template("edit.html", post=post)
     else:
-        if post.title != request.form.get("post_title", ""):
-            post.title = request.form.get("post_title", "")
-            post.slug = unique_slugify(post.title)
-
         post.set_content(request.form.get("post_content", ""))
         post.updated_at = datetime.datetime.now()
 
+        recalculate_readable_id = False
         if any(request.form.getlist("post_draft", type=int)):
             post.draft = True
         else:
@@ -227,6 +224,14 @@ def edit(post_id):
                 post.draft = False
                 post.created_at = datetime.datetime.now()
                 post.updated_at = datetime.datetime.now()
+                recalculate_readable_id = True
+
+        if post.title != request.form.get("post_title", ""):
+            post.title = request.form.get("post_title", "")
+            recalculate_readable_id = True
+
+        if recalculate_readable_id:
+            post.readable_id = get_readable_id(post.created_at, post.title)
 
         db.session.add(post)
         db.session.commit()
@@ -269,7 +274,7 @@ def save_post(post_id):
         return abort(404)
     if post.title != request.form.get("title", ""):
         post.title = request.form.get("title", "")
-        post.slug = unique_slugify(post.title)
+        post.readable_id = get_readable_id(post.created_at, post.title)
     content = request.form.get("content", "")
     content_changed = content != post.get_content()
 
@@ -343,15 +348,16 @@ def slugify(text, delim=u'-', encoding='utf-8'):
         text = unicode(text, encoding=encoding)
     return _punct_re.sub(delim, unidecode(text).lower())
 
-def unique_slugify(text):
-    slug = slugify(text)
+def get_readable_id(publish_date, text):
+    readable_id = '%s/%s' % (publish_date.strftime('%Y/%m/%d'), slugify(text))
+    
     # This could have issues if a post is marked as draft, then live, then 
     # draft, then live and there are > 1 posts with the same slug. Oh well.
-    count = db.session.query(Post).filter_by(slug=slug).count()
+    count = db.session.query(Post).filter_by(readable_id=readable_id).count()
     if count > 0:
-        return "%s-%d" % (slug, count)
+        return "%s-%d" % (readable_id, count)
     else:
-        return slug
+        return readable_id
 
 if __name__ == "__main__":
     if pygments is not None:
