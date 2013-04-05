@@ -20,7 +20,6 @@
                 $("#upload_list").empty();
                 $(files).each(function(i,file){
                     if (!file) return;
-
                     var fd = new FormData();
                     fd.append("file", file);
                     fd.append("dest", destFolder);
@@ -30,7 +29,7 @@
                     xhr.onload = function() {
                         console.log(xhr.responseText);
                         var resp = JSON.parse(xhr.responseText);
-                        $("#upload_list").append("<p><a class='uploadUrl' target='_blank' href='" + resp.url + "'>" + resp.name + "</a></p>")
+                        $("#upload_list").append('<p><a class="uploadUrl" target="_blank" href="' + resp.url + '" data-mimetype="' + file.type + '">' + resp.name + '</a></p>');
                     };
                     xhr.send(fd);
                 })
@@ -38,7 +37,14 @@
 
             $(document).ready(function(){
                 $("#upload_list").on('click', '.uploadUrl', function(ev){
-                    $('#post_content').insertAtCaret('![](' + $(this).attr('href') + ')');
+                    var jq = $(this);
+                    var href = jq.attr('href');
+                    var mimetype = jq.attr('data-mimetype');
+                    var markdown_blurb = '[ ](' + href + ')';
+                    if (mimetype.match(/image\/.*/)) {
+                        markdown_blurb = '!' + markdown_blurb;
+                    }
+                    $('#post_content').insertAtCaret(markdown_blurb);
                     ev.preventDefault();
                 })
             })

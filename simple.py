@@ -8,6 +8,7 @@ from functools import wraps
 from unicodedata import normalize
 from os import urandom
 from base64 import b32encode
+import mimetypes
 
 # web stuff and markdown imports
 import markdown
@@ -20,6 +21,7 @@ from werkzeug.utils import secure_filename
 import json
 from flask import send_from_directory
 from unidecode import unidecode
+from bs4 import BeautifulSoup
 
 try:
     import pygments
@@ -76,6 +78,18 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime(), index=True)
     updated_at = db.Column(db.DateTime())
 
+    def links_as_dict(self):
+        if self.links:
+            return json.loads(self.links)
+        return {}
+
+
+    def has_audio(self):
+        for link in self.links_as_dict():
+            if link.get('mimetype', '').startswith('audio/'):
+                return True
+        return False
+
     def render_content(self):
         _cached = cache.get("post_%s"%self.id)
         if _cached is not None:
@@ -87,8 +101,21 @@ class Post(db.Model):
     def set_content(self, content):
         cache.delete("post_%s"%self.id)
         self.text = content
+        post_links = self._parse_post_links()
+        self.links = json.dumps(post_links) if len(post_links) > 0 else None
 
     def get_content(self): return self.text
+
+    def _parse_post_links(self):
+        soup = BeautifulSoup(self.render_content())
+        links = []
+        for link in soup.find_all('a'):
+            href = link.get('href')
+            if href:
+                mimetype,_ = mimetypes.guess_type(href)
+                if mimetype:
+                    links.append({'href': href, 'mimetype': mimetype})
+        return links
 
 
 try:
@@ -118,6 +145,8 @@ def requires_authentication(func):
         return func(*args, **kwargs)
 
     return _auth_decorator
+
+
 
 
 @app.route("/")
@@ -152,16 +181,6 @@ def render_font_style():
     t = render_template("font_style.css", font_name=app.config["FONT_NAME"])
     return Response(t, mimetype="text/css")
 
-def get_post_links(post):
-    if post.links:
-        return json.loads(post.links)
-    return {}
-
-def has_audio(post_links):
-    for link in post_links:
-        if link.get('mimetype', '').startswith('audio/'):
-            return True
-    return False
 
 
 @app.route("/<int:post_id>")
@@ -172,9 +191,7 @@ def view_post(post_id):
     except Exception:
         return abort(404)
 
-    post_links = get_post_links(post)
-
-    return render_template("view.html", post=post, has_audio=has_audio(post_links), is_admin=is_admin())
+    return render_template("view.html", post=post, has_audio=post.has_audio(), is_admin=is_admin())
 
 
 @app.route("/<path:readable_id>")
@@ -186,8 +203,7 @@ def view_post_slug(readable_id):
         return abort(404)
 
     pid = request.args.get("pid", "0")
-    post_links = get_post_links(post)
-    return render_template("view.html", post=post, has_audio=has_audio(post_links), pid=pid, is_admin=is_admin())
+    return render_template("view.html", post=post, has_audio=post.has_audio(), pid=pid, is_admin=is_admin())
 
 
 @app.route("/new", methods=["POST", "GET"])
