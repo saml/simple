@@ -72,6 +72,7 @@ class Post(db.Model):
     text = db.Column(db.String(), default="")
     draft = db.Column(db.Boolean(), index=True, default=True)
     text_type = db.Column(db.String(), default='markdown')
+    links = db.Column(db.String(), nullable=True)
     created_at = db.Column(db.DateTime(), index=True)
     updated_at = db.Column(db.DateTime())
 
@@ -151,6 +152,17 @@ def render_font_style():
     t = render_template("font_style.css", font_name=app.config["FONT_NAME"])
     return Response(t, mimetype="text/css")
 
+def get_post_links(post):
+    if post.links:
+        return json.loads(post.links)
+    return {}
+
+def has_audio(post_links):
+    for link in post_links:
+        if link.get('mimetype', '').startswith('audio/'):
+            return True
+    return False
+
 
 @app.route("/<int:post_id>")
 def view_post(post_id):
@@ -160,7 +172,9 @@ def view_post(post_id):
     except Exception:
         return abort(404)
 
-    return render_template("view.html", post=post, is_admin=is_admin())
+    post_links = get_post_links(post)
+
+    return render_template("view.html", post=post, has_audio=has_audio(post_links), is_admin=is_admin())
 
 
 @app.route("/<path:readable_id>")
@@ -172,7 +186,8 @@ def view_post_slug(readable_id):
         return abort(404)
 
     pid = request.args.get("pid", "0")
-    return render_template("view.html", post=post, pid=pid, is_admin=is_admin())
+    post_links = get_post_links(post)
+    return render_template("view.html", post=post, has_audio=has_audio(post_links), pid=pid, is_admin=is_admin())
 
 
 @app.route("/new", methods=["POST", "GET"])
@@ -199,7 +214,9 @@ def edit(post_id):
     if request.method == "GET":
         return render_template("edit.html", post=post)
     else:
-        post.set_content(request.form.get("post_content", ""))
+        post_content = request.form.get("post_content", "")
+
+        post.set_content(post_content)
         post.updated_at = datetime.datetime.now()
 
         recalculate_readable_id = False

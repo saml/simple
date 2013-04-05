@@ -3,6 +3,9 @@
 {% block title %}<title>{{ post.title }} - {{ config.BLOG_TITLE }}</title>{% endblock %}
 
 {% block head %}
+    {% if has_audio %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sm2.css')}}" />
+    {% endif %}
 {% endblock %}
 
 {% block sidebar %}
@@ -18,7 +21,7 @@
 
 {% block content %}
     <section id="post-{{ post.id }}">
-        <div class="post_container">
+        <div class="post_container {{ 'ui360' if has_audio }}">
             <div class="post_header">
                 <h1>{{ post.title }}</h1>
             </div>
@@ -50,4 +53,17 @@
         {% endif %}
 
     </section>
+{% endblock %}
+
+{% block body_end %}
+    {% if has_audio %}
+        <script src="{{ url_for('static', filename='js/berniecode-animator.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/sm2.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/sm2-player.js') }}"></script>
+        <script>
+            soundManager.setup({
+                url: "{{ url_for('static', filename='swf') }}"
+            });
+        </script>
+    {% endif %}
 {% endblock %}

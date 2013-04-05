@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import sys
 import datetime
 import os
+import json
 
 from simple import db, Post
 
@@ -14,15 +15,21 @@ def read_to_post(src_path):
 		post_time_str = ' '.join(header.find('span', class_="post_time").string.split())
 		post_time = datetime.datetime.strptime(post_time_str, '%B %d %Y, %I:%M %p')
 		title = header.find('h3').string.strip()
+
+		post = Post(title = title, created_at = post_time)
+
 		embed = body.find('div', class_='p_audio_embed')
 		if embed:
 			href = embed.a.get('href')
 			href = '/uploads/posterous' + href[href.find('/audio/'):]
 			mp3 = soup.new_tag('a', href=href)
-			mp3.string = 'Download'
+			mp3.attrs['class'] = 'sm2_button'
+			mp3.string = 'Listen'
 			embed.a.replace_with(mp3)
+			post.links = json.dumps([{'href': href, 'mimetype': 'audio/mpeg'}])
 
-		post = Post(title = title, created_at = post_time)
+
+		
 		src_name,_ = os.path.splitext(os.path.basename(src_path))
 		post.readable_id = post.readable_id + src_name
 		post.set_content(unicode(body))
