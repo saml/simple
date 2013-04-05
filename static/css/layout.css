@@ -100,6 +100,7 @@ header li a {
 header li a:hover {
     border-color: #777;
     color: #444; }
+    
 
 #admin textarea, #admin pre {
     margin: 0;

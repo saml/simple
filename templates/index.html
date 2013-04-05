@@ -3,13 +3,14 @@
 {% block title %}<title>{{ config.BLOG_TITLE }}</title>{% endblock %}
 
 {% block content %}
-
+    {{ pagination.info|safe }}
+    {{ pagination.links|safe }}
     {% for post in posts %}
         <div class="row-fluid">
             <div class="span12">
                 <section id="post-{{ post.id }}">
                     <div class="post_header">
-                        <h1><a href="{{ url_for('view_post_slug', readable_id=post.readable_id, pid=current_page) }}">{{ post.title }}</a></h1>
+                        <h1><a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}">{{ post.title }}</a></h1>
                     </div>
 
                     {% if config.get('POST_CONTENT_ON_HOMEPAGE',True) %}
@@ -23,18 +24,5 @@
         </div>
 
     {% endfor %}
-
-    <ul class="pager">
-        {% if current_page > 0 %}
-            <li class="previous">
-                <a href="{{ url_for("index", page=current_page - 1) }}">&larr; Previous</a>
-            </li>
-        {% endif %}
-
-        {% if is_more %}
-            <li class="next">
-                <a href="{{ url_for("index", page=current_page + 1) }}">Next  &rarr;</a>
-            </li>
-        {% endif %}
-    </ul>
+    {{ pagination.links|safe }}
 {% endblock %}

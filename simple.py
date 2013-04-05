@@ -12,6 +12,7 @@ import mimetypes
 
 # web stuff and markdown imports
 import markdown
+from flask.ext.paginate import Pagination
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash
 from flask import render_template, request, Flask, flash, redirect, url_for, \
@@ -152,27 +153,17 @@ def requires_authentication(func):
 @app.route("/")
 def index():
     """ Index Page. Here is where the magic starts """
-    page = request.args.get("page", 0, type=int)
-    posts_master = db.session.query(Post)\
-        .filter_by(draft=False).order_by(Post.created_at.desc())
-    
-    posts_count = posts_master.count()
 
-    posts = posts_master\
-        .limit(app.config["POSTS_PER_PAGE"])\
-        .offset(page * int(app.config["POSTS_PER_PAGE"])) .all()
+    page = request.args.get("page", 1, type=int)
+    posts_result,total = query_posts_paginated(page, draft=False)
+    posts = posts_result.all()
 
-    # Sorry for the verbose names, but this seemed like a sensible
-    # thing to do.
-    last_possible_post_on_page = page * app.config["POSTS_PER_PAGE"] + \
-                                 app.config["POSTS_PER_PAGE"]
-    there_is_more = posts_count > last_possible_post_on_page
+    pagination = Pagination(posts_result.count(), page=page, total=total, record_name='posts', search=False, per_page=app.config['POSTS_PER_PAGE'])
 
     return render_template("index.html", 
                            posts=posts,
+                           pagination=pagination,
                            now=datetime.datetime.now(),
-                           is_more=there_is_more, 
-                           current_page=page, 
                            is_admin=is_admin())
 
 
@@ -202,8 +193,7 @@ def view_post_slug(readable_id):
         #TODO: Better exception
         return abort(404)
 
-    pid = request.args.get("pid", "0")
-    return render_template("view.html", post=post, has_audio=post.has_audio(), pid=pid, is_admin=is_admin())
+    return render_template("view.html", post=post, has_audio=post.has_audio(), is_admin=is_admin())
 
 
 @app.route("/new", methods=["POST", "GET"])
@@ -272,15 +262,30 @@ def delete(post_id):
     return redirect(request.args.get("next", "")
                     or request.referrer or url_for('index'))
 
+def query_posts_paginated(page=1, draft=False, per_page=app.config['POSTS_PER_PAGE']):
+    all_posts = db.session.query(Post)\
+        .filter_by(draft=draft).order_by(Post.created_at.desc())
+    
+    total = all_posts.count()
+
+    query = all_posts.limit(per_page).offset((page - 1) * int(per_page))
+
+    return (query, total)
 
 @app.route("/admin", methods=["GET", "POST"])
 @requires_authentication
 def admin():
     drafts = db.session.query(Post)\
         .filter_by(draft=True).order_by(Post.created_at.desc()).all()
-    posts = db.session.query(Post).filter_by(draft=False)\
-        .order_by(Post.created_at.desc()).all()
-    return render_template("admin.html", drafts=drafts, posts=posts)
+
+    page = request.args.get("page", 1, type=int)
+    posts_result,total = query_posts_paginated(page, draft=False)
+    posts = posts_result.all()
+
+    pagination = Pagination(posts_result.count(), page=page, total=total, record_name='posts', search=False, per_page=app.config['POSTS_PER_PAGE'])
+
+
+    return render_template("admin.html", drafts=drafts, posts=posts, pagination = pagination)
 
 
 @app.route("/admin/save/<int:post_id>", methods=["POST"])

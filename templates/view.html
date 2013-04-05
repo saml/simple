@@ -30,7 +30,7 @@
         </div>
 
         <br/>
-        <a class="btn btn-inverse" href="{{ url_for('index', page=pid) }}">Back to Blog</a>
+        <a class="btn btn-inverse" href="{{ url_for('index') }}">Back to Blog</a>
         <br/>
 
         {% if config.DISQUS_SHORTNAME and not post.draft %}
