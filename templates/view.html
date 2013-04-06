@@ -10,12 +10,7 @@
 
 {% block sidebar %}
     {% if is_admin %}
-        <br />
-        <li>
-            <p>
-                <a  href="{{ url_for('edit', post_id=post.id) }}">Edit post</a>
-            </p>
-        </li>
+        <li><a  href="{{ url_for('edit', post_id=post.id) }}">Edit post</a></li>
     {% endif %}
 {% endblock %}
 

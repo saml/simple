@@ -3,7 +3,7 @@ body {
     color: #222;
 }
 
-time {
+.time {
     text-transform: uppercase;
     font-weight: 900;
     font-size: 12px;
@@ -50,9 +50,6 @@ a:hover {
     color: red;
     text-decoration: none;
 }
-
-ul {
-    list-style-type: none; }
 
 a:hover {
     color: red; }

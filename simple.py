@@ -185,7 +185,7 @@ def view_post(post_id):
     return render_template("view.html", post=post, has_audio=post.has_audio(), is_admin=is_admin())
 
 
-@app.route("/<path:readable_id>")
+@app.route("/<path:readable_id>.html")
 def view_post_slug(readable_id):
     try:
         post = db.session.query(Post).filter_by(readable_id=readable_id, draft=False).one()
