@@ -1,3 +1,10 @@
+# Getting Started
+
+	pip install -r requirements.txt --user
+	python create_config.py
+	./uwsgi.bash
+
+
 Simple
 ================
 A clone of [Obtvse](http://github.com/NateW/obtvse).
