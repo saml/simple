@@ -113,7 +113,7 @@ class Post(db.Model):
         for link in soup.find_all('a'):
             href = link.get('href')
             if href:
-                mimetype,_ = mimetypes.guess_type(href)
+                mimetype,_ = mimetypes.guess_type(href.lower())
                 if mimetype:
                     links.append({'href': href, 'mimetype': mimetype})
         return links
@@ -318,7 +318,7 @@ def preview(post_id):
         # TODO: Better exception
         return abort(404)
 
-    return render_template("view.html", post=post, preview=True)
+    return render_template("view.html", post=post, has_audio=post.has_audio(), preview=True)
 
 
 def allowed_file(filename):
@@ -374,7 +374,7 @@ def slugify(text, delim=u'-', encoding='utf-8'):
     return _punct_re.sub(delim, unidecode(text).lower())
 
 def get_readable_id(publish_date, text):
-    readable_id = '%s/%s' % (publish_date.strftime('%Y/%m/%d'), slugify(text))
+    readable_id = '%s/%s' % (publish_date.strftime('%Y/%m'), slugify(text))
     
     # This could have issues if a post is marked as draft, then live, then 
     # draft, then live and there are > 1 posts with the same slug. Oh well.

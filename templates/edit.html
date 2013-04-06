@@ -26,8 +26,8 @@
             function upload(files) {
                 var now = new Date();
 
-                // YYYY/MM/DD
-                var destFolder = (new Date()).toISOString().split("T")[0].split('-').join("/");
+                // YYYY/MM
+                var destFolder = (new Date()).toISOString().split("-").slice(0,2).join("/");
 
                 
                 

@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from html2text import html2text
 
 import sys
 import datetime
@@ -26,15 +27,16 @@ def read_to_post(src_path):
 			mp3.attrs['class'] = 'sm2_button'
 			mp3.string = 'Listen'
 			embed.a.replace_with(mp3)
-			post.links = json.dumps([{'href': href, 'mimetype': 'audio/mpeg'}])
 
-
-		
 		src_name,_ = os.path.splitext(os.path.basename(src_path))
 		post.readable_id = post.readable_id + src_name
-		post.set_content(unicode(body))
+
+		#must set this so that set_content() can detect links (for has_audio)
+		#if not set, it doesn't convert to html first... so links is []
+		post.text_type = 'markdown' 
+	
+		post.set_content(html2text(unicode(body)))
 		post.draft = False
-		post.text_type = 'html'
 		return post
 
 
