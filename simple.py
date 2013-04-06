@@ -342,8 +342,9 @@ def upload_file():
 
             file_upload.save(os.path.join(dest_dir, filename))
             url = url_for('uploaded_file', filename=os.path.join(dest_prefix, filename))
-            return json.dumps({'status': 'ok', 'url': url, 'name': filename})
-    return 'ok'
+            return json.dumps({'status': 'ok', 'url': url, 'name': filename});
+        return json.dumps({'status': 'err', 'message': 'file type is not supported'});
+    return json.dumps({'status': 'err', 'message': 'only POST is supported'});
             
 
 @app.route('/uploads/<path:filename>')

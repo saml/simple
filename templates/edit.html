@@ -11,25 +11,62 @@
             window.ondragover = function(e) {e.preventDefault()};
             window.ondrop = function(e) {e.preventDefault(); upload(e.dataTransfer.files); };
 
+            if (typeof String.prototype.f !== 'function') {
+                String.prototype.f = function() {
+                    var args = arguments;
+                    var index = 0;
+                    var replace = function() {
+                        return args[index++];
+                    };
+                    return this.replace(/%s/g, replace);
+                };
+            }
+
+
             function upload(files) {
                 var now = new Date();
 
                 // YYYY/MM/DD
                 var destFolder = (new Date()).toISOString().split("T")[0].split('-').join("/");
 
-                $("#upload_list").empty();
+                
+                
+                var jqProgresses = jQuery('#upload_progress');
+                var jqUploadList = $("#upload_list").empty();
+
+
                 $(files).each(function(i,file){
                     if (!file) return;
                     var fd = new FormData();
                     fd.append("file", file);
                     fd.append("dest", destFolder);
 
+                    var tmpDiv = document.createElement('div');
+                    tmpDiv.innerHTML = '<div class="progress progress-striped active"><div class="bar"></div></div>';
+                    var jqTmp = jQuery(tmpDiv);
+                    var jqProgressBar = jqTmp.find('.bar');
+                    jqProgresses.append(tmpDiv);
+
                     var xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(ev) {
+                        if (ev.lengthComputable) {
+                            var percentage = Math.round(ev.loaded * 100 / ev.total);
+                            jqProgressBar.width(percentage + "%");
+                        }
+
+                    }, false);
+
                     xhr.open("POST", "/upload");
                     xhr.onload = function() {
                         console.log(xhr.responseText);
                         var resp = JSON.parse(xhr.responseText);
-                        $("#upload_list").append('<p><a class="uploadUrl" target="_blank" href="' + resp.url + '" data-mimetype="' + file.type + '">' + resp.name + '</a></p>');
+                        if (resp.status === 'ok') {
+                            var html = '<p><a class="uploadUrl" target="_blank" href="%s" data-mimetype="%s">%s</a></p>'.f(resp.url, file.type, resp.name);
+                            jqUploadList.append(html);
+                        } else {
+                            jqUploadList.append('<p>%s : %s</p>'.f(file.name, resp.message));
+                        }
+                        jqTmp.remove();
                     };
                     xhr.send(fd);
                 })
@@ -228,6 +265,7 @@
                         <div id="drop-upload" class=" well well-small" style="word-wrap: break-word;">
                             Drag files here to upload. Click to insert.
                             <input type="file" onchange="upload(this.files[0])">
+                            <div id="upload_progress"></div>
                             <div id="upload_list"></div>
                         </div>
                     </div>
