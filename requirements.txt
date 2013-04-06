@@ -7,3 +7,4 @@ SQLAlchemy
 Werkzeug
 Pygments
 Unidecode
+beautifulsoup4
