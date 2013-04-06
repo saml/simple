@@ -1,9 +1,13 @@
 {% extends "admin_template.html" %}
 
 {% block css %}
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/layout.css') }}" type="text/css" media="screen" rel="stylesheet">
+    {#
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+
     <link href="/style.css" type="text/css" media="screen" rel="stylesheet">
+    #}
 {% endblock %}
 
 {% block head %}
@@ -372,4 +376,13 @@
     </div>
 
 
+{% endblock %}
+
+
+{% block body_end %}
+<script src="{{ url_for('static', filename='js/tabIndent.js') }}"></script>
+<script>
+    tabIndent.config.tab = '    ';
+    tabIndent.render(document.getElementById("post_content"));
+</script>
 {% endblock %}

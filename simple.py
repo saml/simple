@@ -337,7 +337,7 @@ def upload_file():
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
             filename, extension = os.path.splitext(file_upload.filename)
-            extension = slugify(extension[1:] if extension.startswith('.') else extension)
+            extension = slugify(extension[1:] if extension.startswith('.') else extension).lower()
             filename = '%s.%s' % (slugify(filename), extension)
 
             file_upload.save(os.path.join(dest_dir, filename))

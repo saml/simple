@@ -24,10 +24,6 @@
             {{ post.render_content()|safe }}
         </div>
 
-        <br/>
-        <a class="btn btn-inverse" href="{{ url_for('index') }}">Back to Blog</a>
-        <br/>
-
         {% if config.DISQUS_SHORTNAME and not post.draft %}
             <br/><br/>
 
