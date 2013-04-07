@@ -141,7 +141,6 @@ tabIndent = {
 					contains = classes.indexOf('tabIndent');
 
 					el.addEventListener('keydown', self.events.keydown);
-					el.style.backgroundImage = "url('" + self.config.images + "active.png')";
 					el.style.backgroundPosition = 'top right';
 					el.style.backgroundRepeat = 'no-repeat';
 
