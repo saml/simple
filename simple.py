@@ -355,8 +355,8 @@ def refresh_cache(urls, dryrun=not CACHE_FLUSH_COMMAND):
         for url in urls:
             command = CACHE_FLUSH_COMMAND.replace('$url', url)
             app.logger.debug(command)
-            return_code = subprocess.call(shlex.split(command))
-            results.append({'return_code': return_code, 'url': url})
+            p = subprocess.Popen(shlex.split(command))
+            results.append({'pid': p.pid, 'url': url})
     app.logger.debug(results)
     return results
 
