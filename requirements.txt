@@ -8,3 +8,4 @@ Werkzeug
 Pygments
 Unidecode
 beautifulsoup4
+requests

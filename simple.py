@@ -23,6 +23,7 @@ import json
 from flask import send_from_directory
 from unidecode import unidecode
 from bs4 import BeautifulSoup
+import requests
 
 try:
     import pygments
@@ -38,7 +39,8 @@ app.secret_key = app.config["SECRET_KEY"]
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'ogg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+CACHE_REFRESH_HEADERS = {'X-Cache-Bypass': 1}
+BEGINNING_SLASH = re.compile(r'^/+')
 
 db = SQLAlchemy(app)
 cache_directory = os.path.dirname(__file__)
@@ -61,9 +63,7 @@ MARKDOWN_PARSER = markdown.Markdown(extensions=extensions, safe_mode=False,
 
 class Post(db.Model):
     def __init__(self, title, created_at):
-        if title:
-            self.title = title
-            self.readable_id = get_readable_id(created_at, title)
+        self.title = title
         if created_at:
             self.created_at = created_at
             self.updated_at = created_at
@@ -71,7 +71,7 @@ class Post(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String())
-    readable_id = db.Column(db.String(), index=True, unique=True)
+    readable_id = db.Column(db.String(), index=True, unique=True, nullable=True)
     text = db.Column(db.String(), default="")
     draft = db.Column(db.Boolean(), index=True, default=True)
     text_type = db.Column(db.String(), default='markdown')
@@ -220,6 +220,8 @@ def edit(post_id):
     if request.method == "GET":
         return render_template("edit.html", post=post)
     else:
+        was_initially_published = not post.draft
+        urls_to_flush = []
         post_content = request.form.get("post_content", "")
 
         post.set_content(post_content)
@@ -239,11 +241,18 @@ def edit(post_id):
             post.title = request.form.get("post_title", "")
             recalculate_readable_id = True
 
+        if was_initially_published:
+            urls_to_flush.append(full_url_of(post))
+
         if recalculate_readable_id:
             post.readable_id = get_readable_id(post.created_at, post.title)
 
         db.session.add(post)
         db.session.commit()
+
+        if was_initially_published:
+            refresh_cache(urls_to_flush)
+
         return redirect(url_for("edit", post_id=post_id))
 
 
@@ -258,6 +267,8 @@ def delete(post_id):
     else:
         db.session.delete(post)
         db.session.commit()
+        if not post.draft:
+            refresh_cache([full_url_of(post)])
 
     return redirect(request.args.get("next", "")
                     or request.referrer or url_for('index'))
@@ -287,6 +298,9 @@ def admin():
 
     return render_template("admin.html", drafts=drafts, posts=posts, pagination = pagination)
 
+def full_url_of(post):
+    path = BEGINNING_SLASH.sub('', url_for('view_post_slug', readable_id=post.readable_id))
+    return os.path.join(app.config['BLOG_URL'], path)
 
 @app.route("/admin/save/<int:post_id>", methods=["POST"])
 @requires_authentication
@@ -296,6 +310,7 @@ def save_post(post_id):
     except Exception:
         # TODO Better exception
         return abort(404)
+
     if post.title != request.form.get("title", ""):
         post.title = request.form.get("title", "")
         post.readable_id = get_readable_id(post.created_at, post.title)
@@ -306,6 +321,8 @@ def save_post(post_id):
     post.updated_at = datetime.datetime.now()
     db.session.add(post)
     db.session.commit()
+    if not post.draft:
+        refresh_cache([full_url_of(post)])
     return jsonify(success=True, update=content_changed)
 
 
@@ -324,6 +341,31 @@ def preview(post_id):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def refresh_cache(urls, dryrun=not app.config['REFRESH_CACHE']):
+    app.logger.debug('flush: %s' % urls)
+    results = []
+    if not dryrun:
+        for url in urls:
+            response = requests.get(url, headers=CACHE_REFRESH_HEADERS, timeout=5.0)
+            results.append({'status': response.status_code, 'url': url})
+    return results
+
+@app.route("/cache-refresh", methods=["POST"])
+@requires_authentication
+def cache_refresh():
+    if request.method == 'POST':
+        if request.json is None:
+            response = make_response(jsonify(status = 'err', message = 'request entity is not application/json'))
+            response.status = 400
+            return response
+        urls = requeset.json.get('urls', [])
+        results = refresh_cache(urls)
+        return json.dumps({'status': 'ok', 'results': results})
+    response = make_response(jsonify(status = 'err', message = 'use POST'))
+    response.status = 405
+    return response
+
 
 
 @app.route("/upload", methods=["POST"])
