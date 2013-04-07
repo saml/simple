@@ -9,6 +9,8 @@ from unicodedata import normalize
 from os import urandom
 from base64 import b32encode
 import mimetypes
+import subprocess
+import shlex
 
 # web stuff and markdown imports
 import markdown
@@ -23,7 +25,6 @@ import json
 from flask import send_from_directory
 from unidecode import unidecode
 from bs4 import BeautifulSoup
-import requests
 
 try:
     import pygments
@@ -39,7 +40,7 @@ app.secret_key = app.config["SECRET_KEY"]
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'ogg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-CACHE_REFRESH_HEADERS = {'X-Cache-Bypass': 1}
+CACHE_FLUSH_COMMAND = app.config['CACHE_FLUSH_COMMAND'].strip()
 BEGINNING_SLASH = re.compile(r'^/+')
 
 db = SQLAlchemy(app)
@@ -347,13 +348,16 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def refresh_cache(urls, dryrun=not app.config['REFRESH_CACHE']):
+def refresh_cache(urls, dryrun=not CACHE_FLUSH_COMMAND):
     app.logger.debug('flush: %s' % urls)
     results = []
     if not dryrun:
         for url in urls:
-            response = requests.get(url, headers=CACHE_REFRESH_HEADERS, timeout=5.0)
-            results.append({'status': response.status_code, 'url': url})
+            command = CACHE_FLUSH_COMMAND.replace('$url', url)
+            app.logger.debug(command)
+            return_code = subprocess.call(shlex.split(command))
+            results.append({'return_code': return_code, 'url': url})
+    app.logger.debug(results)
     return results
 
 @app.route("/cache-refresh", methods=["POST"])
@@ -431,6 +435,20 @@ def get_readable_id(publish_date, text):
     else:
         return readable_id
 
+
+if not app.debug:
+    import logging
+    from logging.handlers import RotatingFileHandler
+    handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=100*1024*1024, backupCount=5)
+    handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s'
+        '[in %(filename)s:%(lineno)d]'
+        ))
+    handler.setLevel(getattr(logging, app.config['LOG_LEVEL']))
+    app.logger.addHandler(handler)
+    app.logger.setLevel(getattr(logging, app.config['LOG_LEVEL']))
+
+
+
 if __name__ == "__main__":
     if pygments is not None:
         to_write_path = os.path.join(app.static_folder, "css", "code_styles.css")
@@ -441,12 +459,5 @@ if __name__ == "__main__":
                     fd.write(to_write)
             except IOError:
                 pass
-
-    if not app.debug:
-        import logging
-        from logging.handlers import RotatingFileHandler
-        handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=100*1024*1024, backupCount=5)
-        handler.setLevel(getattr(logging, app.config['LOG_LEVEL']))
-        app.logger.addHandler(handler)
 
     app.run(host="0.0.0.0")
