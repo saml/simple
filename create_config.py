@@ -88,7 +88,7 @@ SETTINGS = (
     input_with_default("SECRET_KEY", "Secret key", b32encode(urandom(32))),
     input_with_default("DISQUS_SHORTNAME", "Disqus Shortname", ""),
     input_with_default("USE_SUBTOME", "Enable SubToMe integration", "y", lambda v: v.lower()[0] == "y")
-    input_with_default("CACHE_FLUSH_COMMAND", "Command for flushing cache. $url is updated entry url. For example, curl -H 'X-Cache-Bypass: 1' $url", None)
+    input_with_default("CACHE_FLUSH_COMMAND", "Command for flushing cache. Should take one argument, which is url of page that's changed. (see ./recache.bash)", None)
     input_with_default('LOG_LEVEL', 'Logger level', 'INFO'),
     input_with_default('LOG_PATH', 'Where to log', 'logs/simple.log')
 )
