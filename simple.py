@@ -442,4 +442,11 @@ if __name__ == "__main__":
             except IOError:
                 pass
 
+    if not app.debug:
+        import logging
+        from logging.handlers import RotatingFileHandler
+        handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=100*1024*1024, backupCount=5)
+        handler.setLevel(getattr(logging, app.config['LOG_LEVEL']))
+        app.logger.addHandler(handler)
+
     app.run(host="0.0.0.0")

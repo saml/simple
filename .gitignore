@@ -7,3 +7,4 @@ cache/
 envsimple/
 uploads/
 *.sock
+logs/
