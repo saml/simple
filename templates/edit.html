@@ -227,6 +227,13 @@
 
                             <div class="row">
                                 <div class="span7 offset1">
+                                    <span class="span2">{{ config.BLOG_URL }}</span> 
+                                    <input class="span5" type="text" id="post_readable_id" name="post_readable_id" value="{{ post.readable_id }}" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="span7 offset1">
                                     <div class="expandingArea text-content" id="edit_post_area">
                                         <pre><span></span><br></pre>
                                         <textarea cols="40" id="post_content" name="post_content" placeholder="Write post here" rows="20">{{ post.text }}</textarea>

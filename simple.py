@@ -221,6 +221,7 @@ def edit(post_id):
         return render_template("edit.html", post=post)
     else:
         was_initially_published = not post.draft
+
         urls_to_flush = []
         post_content = request.form.get("post_content", "")
 
@@ -244,7 +245,11 @@ def edit(post_id):
         if was_initially_published:
             urls_to_flush.append(full_url_of(post))
 
-        if recalculate_readable_id:
+        readable_id = request.form.get("post_readable_id", "")
+
+        if post.readable_id != readable_id:
+            post.readable_id = readable_id
+        elif recalculate_readable_id:
             post.readable_id = get_readable_id(post.created_at, post.title)
 
         db.session.add(post)
