@@ -248,7 +248,7 @@ def edit(post_id):
 
         readable_id = request.form.get("post_readable_id", "")
 
-        if post.readable_id != readable_id:
+        if post.readable_id and (post.readable_id != readable_id):
             post.readable_id = readable_id
         elif recalculate_readable_id:
             post.readable_id = get_readable_id(post.created_at, post.title)

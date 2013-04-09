@@ -228,7 +228,7 @@
                             <div class="row">
                                 <div class="span7 offset1">
                                     <span class="span2">{{ config.BLOG_URL }}</span> 
-                                    <input class="span5" type="text" id="post_readable_id" name="post_readable_id" value="{{ post.readable_id }}" />
+                                    <input class="span5" type="text" id="post_readable_id" name="post_readable_id" value="{{ post.readable_id or '' }}" />
                                 </div>
                             </div>
 
