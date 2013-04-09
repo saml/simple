@@ -3,11 +3,6 @@
 {% block css %}
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/layout.css') }}" type="text/css" media="screen" rel="stylesheet">
-    {#
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen">
-
-    <link href="/style.css" type="text/css" media="screen" rel="stylesheet">
-    #}
 {% endblock %}
 
 {% block head %}
@@ -286,109 +281,9 @@
                             <div id="upload_list"></div>
                         </div>
                     </div>
-
-                    <a href="#markdown-help" role="button" class="btn" data-toggle="modal"><img src="{{ url_for('static', filename='39x24-solid.png') }}"></a>
                 </div>
             </form>
     </div>
-
-
-    <div id="markdown-help" class="bigModal modal hide fade" tabindex="-1" role="dialog" aria-labelledby="markdown-help-label" aria-hidden="true">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-            <h3 id="markdown-help-label"><img id="markdown-help-img" src="{{ url_for('static', filename='66x40-solid.png') }}"> <h1 id="markdown-help-title">Cheat Sheet</h1></h3>
-        </div>
-        <div class="modal-body">
-   
-            <div class="row">
-                <div class="span3">
-                    <h4>Headers</h4>
-                    <div class="well well-small">
-                        <p> # This is an &lt;h1&gt; tag </p>
-                        <p>## This is an &lt;h2&gt; tag </p>
-                        <p>###### This is an &lt;h6&gt; tag </p>
-                    </div>
-
-                    <h4>Text styles</h4>
-                    <div class="well well-small">
-                        <p>*This text will be italic*</p>
-                        <p>_This will also be italic_</p>
-                        <p>**This text will be bold**</p>
-                        <p>__This will also be bold__</p>
-
-                        <p>*You **can** combine them*</p>
-                    </div>
-                </div>
-                <div class="span3">
-                    <h4>Lists - Unordered</h4>
-                    <div class="well well-small">
-                        <p>* Item 1</p>
-                        <p>* Item 2</p>
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;* Item 2a</p>
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;* Item 2b</p>
-                    </div>
-
-                    <h4>Lists - Ordered</h4>
-                    <div class="well well-small">
-                            <p>1. Item 1</p>
-                            <p>2. Item 2</p>
-                            <p>3. Item 3</p>
-                           <p>&nbsp;&nbsp;&nbsp;&nbsp;* Item 3a</p>
-                           <p>&nbsp;&nbsp;&nbsp;&nbsp;* Item 3b</p>
-                    </div>
-                </div>
-                <div class="span3">
-                    <h4>Images</h4>
-                    <div class="well well-small">
-                        <p>![Markdown Logo](/img/logo.png)</p>
-                        <p>Format: ![Alt Text](url)</p>
-                    </div>
-                    <h4>Links</h4>
-                    <div class="well well-small">
-                        <p>[GitHub](http://github.com)</p>
-                    </div>
-                    <h4>Blockquotes</h4>
-                    <div class="well well-small">
-                        <p>As somone said:</p>
-                        <p>&gt; First, solve the problem. </p>
-                        <p>&gt; Then, write the code.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="span3">
-                    <h4>Syntax highlighting with <a href="http://pythonhosted.org/Markdown/extensions/code_hilite.html">CodeHilite</a></h4>
-                    <div class="well well-small">
-                        <p>~~~python</p>
-                        <p>print 'hello world'</p>
-                        <p>~~~</p>
-                    </div>
-                </div>
-                <div class="span3">
-                    <h4>Miscellaneous</h4>
-                    <div class="well well-small">
-                        <p>[TOC]</p>
-                        <p>Will generate a table of contents with links</p>
-                    </div>
-                </div>
-                <div class="span3">
-                    <h4>More info</h4>
-                    <div class="well well-small">
-                        <p><a href="http://pythonhosted.org/Markdown/extensions/code_hilite.html">CodeHilight</a></p>
-                        <p><a href="http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html">Fenced Code Blocks</a></p>
-                        <p><a href="http://pythonhosted.org/Markdown/extensions/toc.html">Table of contents</a></p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-        </div>
-    </div>
-
-
 {% endblock %}
 
 
