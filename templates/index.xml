@@ -9,7 +9,7 @@
         <item>
             <title>{{ post.title }}</title>
             <description>{{ post.render_content() }}</description>
-            <pubDate>{{ post.created_at.strftime('%b %d, %Y') }}</pubDate>
+            <pubDate>{{ post.created_at|datetimeformat('%b %d, %Y') }}</pubDate>
             <link>{{ p_url }}</link>
             <guid>{{ p_url }}</guid>
         </item>

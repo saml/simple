@@ -11,6 +11,7 @@ from base64 import b32encode
 import mimetypes
 import subprocess
 import shlex
+import dateutil.parser
 
 # web stuff and markdown imports
 import markdown
@@ -66,17 +67,27 @@ def current_datetime():
     return datetime.datetime.utcnow()
 
 def format_datetime(date, format='%Y-%m-%d %I:%m %p %Z'):
+    if not date:
+        return ''
     return pytz.utc.localize(date).strftime(format)
+
+def format_iso8601_notz(date):
+    return format_datetime(date, '%Y-%m-%dT%H:%M:%S')
+
+def format_iso8601(date):
+    if not date:
+        return ''
+    return pytz.utc.localize(date).isoformat()
+    
 
 if not app.jinja_env.filters.has_key('datetimeformat'):
     app.jinja_env.filters['datetimeformat'] = format_datetime
+    app.jinja_env.filters['iso8601notz'] = format_iso8601_notz
+    app.jinja_env.filters['iso8601'] = format_iso8601
 
 class Post(db.Model):
-    def __init__(self, title, created_at):
+    def __init__(self, title):
         self.title = title
-        if created_at:
-            self.created_at = created_at
-            self.updated_at = created_at
 
     __tablename__ = "posts"
     id = db.Column(db.Integer(), primary_key=True)
@@ -209,8 +220,7 @@ def view_post_slug(readable_id):
 @app.route("/new", methods=["POST", "GET"])
 @requires_authentication
 def new_post():
-    post = Post(title=request.form.get("title", "untitled"),
-                created_at=current_datetime())
+    post = Post(title=request.form.get("title", "untitled"))
 
     db.session.add(post)
     db.session.commit()
@@ -238,15 +248,31 @@ def edit(post_id):
         post.set_content(post_content)
         post.updated_at = current_datetime()
 
+        publish_date = request.form.get('post_publish_date', '').strip()
+        if len(publish_date) > 0:
+            publish_date = dateutil.parser.parse(publish_date + 'Z') #UTC everywhere
+            if publish_date.tzinfo:
+                publish_date = publish_date.astimezone(pytz.utc).replace(tzinfo = None)
+        else:
+            publish_date = None
+
+
         recalculate_readable_id = False
+
+        if publish_date and post.created_at != publish_date:
+            post.created_at = publish_date
+            recalculate_readable_id = True
+
         if any(request.form.getlist("post_draft", type=int)):
             post.draft = True
         else:
+            #user wants to publish
             if post.draft:
                 post.draft = False
-                post.created_at = current_datetime()
-                post.updated_at = post.created_at
-                recalculate_readable_id = True
+                if not post.created_at:
+                    post.created_at = current_datetime()
+                    post.updated_at = post.created_at
+                    recalculate_readable_id = True
 
         if post.title != request.form.get("post_title", ""):
             post.title = request.form.get("post_title", "")
@@ -260,7 +286,7 @@ def edit(post_id):
         if post.readable_id and (post.readable_id != readable_id):
             post.readable_id = readable_id
         elif recalculate_readable_id:
-            post.readable_id = get_readable_id(post.created_at, post.title)
+            post.readable_id = get_readable_id(post.created_at, post.title, post_id)
 
         db.session.add(post)
         db.session.commit()
@@ -328,7 +354,7 @@ def save_post(post_id):
 
     if post.title != request.form.get("title", ""):
         post.title = request.form.get("title", "")
-        post.readable_id = get_readable_id(post.created_at, post.title)
+        post.readable_id = get_readable_id(post.created_at, post.title, post_id)
     content = request.form.get("content", "")
     content_changed = content != post.get_content()
 
@@ -434,16 +460,15 @@ def slugify(text, delim=u'-', encoding='utf-8'):
         text = unicode(text, encoding=encoding)
     return _punct_re.sub(delim, unidecode(text).lower())
 
-def get_readable_id(publish_date, text):
+def get_readable_id(publish_date, text, post_id):
     readable_id = '%s/%s' % (publish_date.strftime('%Y/%m'), slugify(text))
     
     # This could have issues if a post is marked as draft, then live, then 
     # draft, then live and there are > 1 posts with the same slug. Oh well.
-    count = db.session.query(Post).filter_by(readable_id=readable_id).count()
-    if count > 0:
-        return "%s-%d" % (readable_id, count)
-    else:
+    post = db.session.query(Post).filter_by(readable_id=readable_id).first()
+    if post is None or post.id == post_id:
         return readable_id
+    return "%s-1" % readable_id
 
 
 if not app.debug:

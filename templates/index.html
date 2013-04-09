@@ -17,7 +17,7 @@
                         <br/>
                         {{ post.render_content()|safe }}
                     {% else %}
-                        <p style="color: #999;">Posted: {{ post.created_at.strftime('%Y-%m-%d') }}</p>
+                        <p style="color: #999;">Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
                     {% endif %}
                 </section>
             </div>
