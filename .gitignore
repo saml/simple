@@ -8,3 +8,4 @@ envsimple/
 uploads/
 *.sock
 logs/
+templates/custom-*

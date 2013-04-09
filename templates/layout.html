@@ -30,40 +30,7 @@
     </head>
     <body>
         <div class="container-fluid">
-            <div class="navbar">
-                <div class="navbar-inner">
-                    <a class="brand" href="{{ url_for('index') }}">{{ config.BLOG_TITLE }}<br />
-                        <small><em>{{ config.BLOG_TAGLINE }}</em></small>
-                    </a>
-          
-                    <ul class="nav">
-                        {% if config.GITHUB_USERNAME %}
-                            <li><a href="https://github.com/{{ config.GITHUB_USERNAME }}/">Github</a></li>
-                        {% endif %}
-                        {% if config.CONTACT_EMAIL %}
-                            <li><a href="mailto:{{ config.CONTACT_EMAIL }}?subject:Howdy">Email me</a></li>
-                        {% endif %}
-                        {% if config.TWITTER_HANDLE %}
-                            <li><a href="https://twitter.com/{{ config.TWITTER_HANDLE }}/">Twitter</a></li>
-                        {% endif %}
-                        {% if config.GOOGLE_PLUS_PROFILE %}
-                            <li><a href="https://plus.google.com/{{ config.GOOGLE_PLUS_PROFILE }}/posts">Google+</a></li>
-                        {% endif %}
-
-                        {% if config.USE_SUBTOME %}
-                        <li><a onclick="(function(){var z=document.createElement('script');z.src='https://www.subtome.com/load.js';document.body.appendChild(z);})()"
-                                href="#">Subscribe</a></li>
-                        {% endif %}
-
-                        {% if is_admin %}
-                            <li><a href="{{ url_for('admin') }}">Admin</a></li>
-                        {% endif %}
-
-                        {% block sidebar %}{% endblock %}
-                    </ul>
-                </div>
-            </div>
-            <div class="span10 content">
+            <div class="span12 content">
                 <div class="row-fluid">
                     <div class="span12 time">
                         {% if post %}
@@ -83,7 +50,18 @@
                 </div>
             </div>
 
-
+            <ul class="nav nav-pills">
+                <li>
+                    <a class="brand" href="{{ url_for('index') }}">{{ config.BLOG_TITLE }}<br />
+                        <small><em>{{ config.BLOG_TAGLINE }}</em></small>
+                    </a>
+                </li>
+                {% include "custom-navlist.html" ignore missing %}
+                {% if is_admin %}
+                    <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                {% endif %}
+                {% block sidebar %}{% endblock %}
+            </ul>
         </div>
 
 
