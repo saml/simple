@@ -62,6 +62,14 @@ if pygments is not None:
 MARKDOWN_PARSER = markdown.Markdown(extensions=extensions, safe_mode=False,
                                     output_format="html5")
 
+def current_datetime():
+    return datetime.datetime.utcnow()
+
+def format_datetime(date, format='%Y-%m-%d %I:%m %p %Z'):
+    return pytz.utc.localize(date).strftime(format)
+
+if not app.jinja_env.filters.has_key('datetimeformat'):
+    app.jinja_env.filters['datetimeformat'] = format_datetime
 
 class Post(db.Model):
     def __init__(self, title, created_at):
@@ -78,8 +86,8 @@ class Post(db.Model):
     draft = db.Column(db.Boolean(), index=True, default=True)
     text_type = db.Column(db.String(), default='markdown')
     links = db.Column(db.String(), nullable=True)
-    created_at = db.Column(db.DateTime(), index=True)
-    updated_at = db.Column(db.DateTime())
+    created_at = db.Column(db.DateTime(timezone=True), index=True)
+    updated_at = db.Column(db.DateTime(timezone=True))
 
     def links_as_dict(self):
         if self.links:
@@ -126,8 +134,6 @@ try:
 except Exception:
     pass
 
-def current_datetime(tz=pytz.utc):
-    return datetime.datetime.now(tz)
 
 def is_admin():
     auth = request.authorization

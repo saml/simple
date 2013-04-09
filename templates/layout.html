@@ -67,9 +67,9 @@
                 <div class="row-fluid">
                     <div class="span12 time">
                         {% if post %}
-                            Posted {{ post.created_at.strftime('%Y-%m-%d %h:%m %p %Z') }}
+                            Posted {{ post.created_at|datetimeformat }}
                             {% if post.created_at.strftime('%Y-%m-%d %H') != post.updated_at.strftime('%Y-%m-%d %H') %}
-                                , Updated {{ post.updated_at.strftime('%Y-%m-%d %h:%m %p %Z') }}
+                                , Updated {{ post.updated_at|datetimeformat }}
                             {% endif %}
                         {% else %}
                             <div class="visible-phone">
