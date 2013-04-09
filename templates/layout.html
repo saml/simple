@@ -67,9 +67,9 @@
                 <div class="row-fluid">
                     <div class="span12 time">
                         {% if post %}
-                            Posted {{ post.created_at.strftime('%B %d, %Y') }}
-                            {% if post.created_at.strftime('%B %d, %Y') != post.updated_at.strftime('%B %d, %Y') %}
-                                , Updated {{ post.updated_at.strftime('%B %d, %Y') }}
+                            Posted {{ post.created_at.strftime('%Y-%m-%d %h:%m %p %Z') }}
+                            {% if post.created_at.strftime('%Y-%m-%d %H') != post.updated_at.strftime('%Y-%m-%d %H') %}
+                                , Updated {{ post.updated_at.strftime('%Y-%m-%d %h:%m %p %Z') }}
                             {% endif %}
                         {% else %}
                             <div class="visible-phone">
@@ -113,4 +113,4 @@
 
         {% block body_end %}{% endblock %}
     </body>
-</html>
+</html>`

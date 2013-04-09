@@ -125,6 +125,8 @@ try:
 except Exception:
     pass
 
+def current_datetime(tz=pytz.utc):
+    return datetime.datetime.now(tz)
 
 def is_admin():
     auth = request.authorization
@@ -164,7 +166,7 @@ def index():
     return render_template("index.html", 
                            posts=posts,
                            pagination=pagination,
-                           now=datetime.datetime.now(),
+                           now=current_datetime(),
                            is_admin=is_admin())
 
 
@@ -201,7 +203,7 @@ def view_post_slug(readable_id):
 @requires_authentication
 def new_post():
     post = Post(title=request.form.get("title", "untitled"),
-                created_at=datetime.datetime.now())
+                created_at=current_datetime())
 
     db.session.add(post)
     db.session.commit()
@@ -227,7 +229,7 @@ def edit(post_id):
         post_content = request.form.get("post_content", "")
 
         post.set_content(post_content)
-        post.updated_at = datetime.datetime.now()
+        post.updated_at = current_datetime()
 
         recalculate_readable_id = False
         if any(request.form.getlist("post_draft", type=int)):
@@ -235,8 +237,8 @@ def edit(post_id):
         else:
             if post.draft:
                 post.draft = False
-                post.created_at = datetime.datetime.now()
-                post.updated_at = datetime.datetime.now()
+                post.created_at = current_datetime()
+                post.updated_at = post.created_at
                 recalculate_readable_id = True
 
         if post.title != request.form.get("post_title", ""):
@@ -324,7 +326,7 @@ def save_post(post_id):
     content_changed = content != post.get_content()
 
     post.set_content(content)
-    post.updated_at = datetime.datetime.now()
+    post.updated_at = current_datetime()
     db.session.add(post)
     db.session.commit()
     if not post.draft:
