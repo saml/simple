@@ -10,3 +10,4 @@ Unidecode
 beautifulsoup4
 requests
 pytz
+python-dateutil
