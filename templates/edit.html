@@ -1,163 +1,63 @@
 {% extends "admin_template.html" %}
 
 {% block css %}
-    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+{#
     <link href="{{ url_for('static', filename='css/layout.css') }}" type="text/css" media="screen" rel="stylesheet">
+    #}
 {% endblock %}
 
 {% block head %}
-    <style>
-        .sidebar-nav-fixed {
-            position:fixed;
-        }
-
-        div#drop-upload{
-            font-size: 13px;
-            margin-left: 0px;
-            color: #1e2221;
-            width: 100%;
-            padding: 1px;
-        }
-        div#drop-upload input{
-            font-size: 13px;
-        }
-
-        #navbar{
-            position: fixed;
-            bottom: 0; left: 20px;
-            width: 100%;
-            background: #fff;
-        }
-
-        #publish-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            background: #222;
-            width: 100%;
-            text-align: center;
-            padding-top: 15px;
-            padding-right: 0px;
-            padding-bottom: 15px;
-            padding-left: 0px;
-            padding-bottom: 0px;
-            color: #fff;
-            font-size: 14px;
-        }
-
-        #auto-save{
-            color: #fff;
-        }
-        textarea {
-            font-family: monospace;
-            font-size: 14px;
-        }
-
-        .bigModal {
-            width:900px;
-            margin-left:-33%;
-        }
-        .modal-body {
-            max-height: 700px;
-            padding-top: 0px;
-        }
-        #markdown-help-img{
-            padding-right: 10px;
-            float: left;
-        }
-        #markdown-help-title{
-            margin: 1px;
-        }
-        p{
-            margin: 10px;
-        }
-        #help-title{
-            margin-left: 35px;
-        }
-    </style>
-
 {% endblock %}
 
 
 {% block content %}
     <div class="container-fluid">
-            <form accept-charset="UTF-8" action="" class="edit_post" id="edit_post" method="post">
-                <div class="post_container">
-                    <div class="span10" style="padding-top: 60px ;">
-                            <div class="row">
-                                <div class="span7 offset1">
-                                    <div class="expandingArea text-title">
-                                        <pre><span></span><br></pre>
-                                        <div class="post_header">
-                                            <textarea class="post_title" id="post_title" name="post_title" placeholder="Title here" rows="2">{{ post.title }}</textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="span7 offset1">
-                                    <span class="span2">{{ config.BLOG_URL }}</span> 
-                                    <input class="span5" type="text" id="post_readable_id" name="post_readable_id" value="{{ post.readable_id or '' }}" />
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="span7 offset1">
-                                    <input class="span5" type="text" id="post_publish_date" name="post_publish_date" value="{{ post.created_at|iso8601notz }}" />
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="span7 offset1">
-                                    <div class="expandingArea text-content" id="edit_post_area">
-                                        <pre><span></span><br></pre>
-                                        <textarea cols="40" id="post_content" name="post_content" placeholder="Write post here" rows="20">{{ post.text }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-                     </div>
-                 </div>
-
-                <div id="publish-bar" class="center">
-                    <div class="span1"></div>
-                    <div class="span1">
-                        <a class="btn btn-inverse" href="{{ url_for("admin") }}">Admin</a>
-                    </div>
-                    <div class="span1">
-                        <a class="btn btn-inverse" href="{{ url_for('delete', post_id=post.id, next="admin") }}">Delete</a>
-                    </div>
-                    <div class="span1">
-                        <label id="auto-save" for="post_draft">Draft</label>
-                        <input name="post_draft" type="hidden" value="0" /><input id="post_draft" name="post_draft" type="checkbox" value="1" {% if post.draft %}checked{% endif %} />
-                    </div>
-
-
-                    {% if post.draft %}
-                        <div class="span1">
-                            <a class="btn btn-inverse" href="{{ url_for('preview', post_id=post.id) }}" target="previewPage" onclick="issueSaveAjax({{ post.id }})">Preview</a>
-                        </div>
-                    {% else %}
-                        <div class="span2">
-                            <a class="btn btn-inverse" href="{{  url_for('view_post_slug', readable_id=post.readable_id) }}" target="_blank">View live</a>
-                        </div>
-                    {% endif %}
-
-
-                    <div class="span1">
-                        <button class="btn btn-inverse" onclick="$('#edit_post').submit()">Save</button>
-                    </div>
-
-                    <div class="span3">
-                        <div id="drop-upload" class=" well well-small" style="word-wrap: break-word;">
-                            Drag files here to upload. Click to insert.
-                            <input type="file" onchange="upload(this.files[0])">
-                            <div id="upload_progress"></div>
-                            <div id="upload_list"></div>
-                        </div>
-                    </div>
+        <form accept-charset="UTF-8" class="edit_post form-horizontal" id="edit_post" method="post">
+            <div class="control-group">
+                <label class="control-label">Title</label>
+                <div class="controls">
+                    <input type="text" class="post_title span8" id="post_title" name="post_title" placeholder="Title here" value="{{ post.title }}">
                 </div>
-            </form>
+                <label class="control-label">{{ config.BLOG_URL }}</label>
+                <div class="controls">
+                    <input class="span8" type="text" id="post_readable_id" name="post_readable_id" value="{{ post.readable_id or '' }}" />
+                </div>
+                <label class="control-label">Pub Date</label>
+                <div class="controls">
+                    <input class="span8" type="text" id="post_publish_date" name="post_publish_date" value="{{ post.created_at|iso8601notz }}" />
+                </div>
+
+                <label class="control-label">Content</label>
+                <div class="controls">
+                    <textarea class="span8" cols="40" id="post_content" name="post_content" placeholder="Write post here" rows="20">{{ post.text }}</textarea>
+                </div>
+
+                <label id="auto-save" class="control-label" for="post_draft">Draft</label>
+                <div class="controls">
+                    <input name="post_draft" type="hidden" value="0" />
+                    <input id="post_draft" name="post_draft" type="checkbox" value="1" {% if post.draft %}checked{% endif %} />
+                </div>
+            </div>
+            <div class="control-group">
+                <div id="drop-upload" class=" well well-small controls" style="word-wrap: break-word;">
+                    Drag files here to upload. Click to insert.
+                    <input type="file" onchange="upload(this.files[0])">
+                    <div id="upload_progress"></div>
+                    <div id="upload_list"></div>
+                </div>
+            </div>
+               
+        </form>
+        <ul class="nav nav-pills">
+            <li><a href="{{ url_for("admin") }}">Admin</a></li>
+            <li><a href="{{ url_for('delete', post_id=post.id, next="admin") }}">Delete</a></li>
+            <li>{% if post.draft %}
+                <a href="{{ url_for('preview', post_id=post.id) }}" target="previewPage" onclick="issueSaveAjax({{ post.id }})">Preview</a>
+            {% else %}
+                <a href="{{  url_for('view_post_slug', readable_id=post.readable_id) }}" target="_blank">View live</a>
+            {% endif %}</li>
+            <li><button class="btn btn-success" onclick="$('#edit_post').submit()">Save</button></li>
+        </ul>
     </div>
 {% endblock %}
 
