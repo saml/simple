@@ -19,6 +19,7 @@
         <div class="post_container {{ 'ui360' if has_audio }}">
             <div class="post_header">
                 <h1>{{ post.title }}</h1>
+                <time datetime="{{ post.created_at|iso8601 }}">{{ post.created_at|datetimeformat }}</time>
             </div>
             <br/>
             {{ post.render_content()|safe }}

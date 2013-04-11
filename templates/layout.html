@@ -33,14 +33,10 @@
             <div class="span12 content">
                 <div class="row-fluid">
                     <div class="span12 time">
-                        {% if post %}
-                            <time datetime="{{ post.created_at|iso8601 }}">{{ post.created_at|datetimeformat }}</time>
-                        {% else %}
-                            <div class="visible-phone">
-                                <h3><a href="{{ url_for('index') }}">{{ config.BLOG_TITLE }}</a></h3>
-                                <span>{{ config.BLOG_TAGLINE }}</span>
-                            </div>
-                        {% endif %}
+                        <div class="visible-phone">
+                            <h3><a href="{{ url_for('index') }}">{{ config.BLOG_TITLE }}</a></h3>
+                            <span>{{ config.BLOG_TAGLINE }}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="row-fluid">

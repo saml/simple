@@ -6,132 +6,7 @@
 {% endblock %}
 
 {% block head %}
-        <script>
-            window.ondragover = function(e) {e.preventDefault()};
-            window.ondrop = function(e) {e.preventDefault(); upload(e.dataTransfer.files); };
-
-            if (typeof String.prototype.f !== 'function') {
-                String.prototype.f = function() {
-                    var args = arguments;
-                    var index = 0;
-                    var replace = function() {
-                        return args[index++];
-                    };
-                    return this.replace(/%s/g, replace);
-                };
-            }
-
-
-            function upload(files) {
-                var now = new Date();
-
-                // YYYY/MM
-                var destFolder = (new Date()).toISOString().split("-").slice(0,2).join("/");
-
-                
-                
-                var jqProgresses = jQuery('#upload_progress');
-                var jqUploadList = $("#upload_list").empty();
-
-
-                $(files).each(function(i,file){
-                    if (!file) return;
-                    var fd = new FormData();
-                    fd.append("file", file);
-                    fd.append("dest", destFolder);
-
-                    var tmpDiv = document.createElement('div');
-                    tmpDiv.innerHTML = '<div class="progress progress-striped active"><div class="bar"></div></div>';
-                    var jqTmp = jQuery(tmpDiv);
-                    var jqProgressBar = jqTmp.find('.bar');
-                    jqProgresses.append(tmpDiv);
-
-                    var xhr = new XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", function(ev) {
-                        if (ev.lengthComputable) {
-                            var percentage = Math.round(ev.loaded * 100 / ev.total);
-                            jqProgressBar.width(percentage + "%");
-                        }
-
-                    }, false);
-
-                    xhr.open("POST", "/upload");
-                    xhr.onload = function() {
-                        console.log(xhr.responseText);
-                        var resp = JSON.parse(xhr.responseText);
-                        if (resp.status === 'ok') {
-                            var html = '<p><a class="uploadUrl" target="_blank" href="%s" data-mimetype="%s">%s</a></p>'.f(resp.url, file.type, resp.name);
-                            jqUploadList.append(html);
-                        } else {
-                            jqUploadList.append('<p>%s : %s</p>'.f(file.name, resp.message));
-                        }
-                        jqTmp.remove();
-                    };
-                    xhr.send(fd);
-                })
-            }
-
-            $(document).ready(function(){
-                $("#upload_list").on('click', '.uploadUrl', function(ev){
-                    var jq = $(this);
-                    var href = jq.attr('href');
-                    var mimetype = jq.attr('data-mimetype');
-                    var markdown_blurb = '[ ](' + href + ')';
-                    if (mimetype.match(/image\/.*/)) {
-                        markdown_blurb = '!' + markdown_blurb;
-                    }
-                    $('#post_content').insertAtCaret(markdown_blurb);
-                    ev.preventDefault();
-                })
-            })
-
-             $.fn.extend({
-                insertAtCaret: function(myValue){
-                    var obj;
-                    if( typeof this[0].name !='undefined' ) obj = this[0];
-                    else obj = this;
-
-                    if ($.browser.msie) {
-                        obj.focus();
-                        sel = document.selection.createRange();
-                        sel.text = myValue;
-                        obj.focus();
-                    }else if ($.browser.mozilla || $.browser.webkit) {
-                        var startPos = obj.selectionStart;
-                        var endPos = obj.selectionEnd;
-                        var scrollTop = obj.scrollTop;
-                        obj.value = obj.value.substring(0, startPos)+myValue+obj.value.substring(endPos,obj.value.length);
-                        obj.focus();
-                        obj.selectionStart = startPos + myValue.length;
-                        obj.selectionEnd = startPos + myValue.length;
-                        obj.scrollTop = scrollTop;
-                    } else {
-                        obj.value += myValue;
-                        obj.focus();
-                    }
-                }
-            })
-
-
-
-
-        </script>
-
-
-    {% if post.draft %}
-        <script type="text/javascript">
-            function SaveTick(){
-                issueSaveAjax({{ post.id }}, false);
-                setTimeout("SaveTick()", 4000);
-            }
-            $(document).ready(function(){
-                setTimeout("SaveTick();", 10000);
-            })
-        </script>
-    {% endif %}
-
-
-        <style>
+    <style>
         .sidebar-nav-fixed {
             position:fixed;
         }
@@ -288,6 +163,130 @@
 
 
 {% block body_end %}
+    <script>
+        window.ondragover = function(e) {e.preventDefault()};
+        window.ondrop = function(e) {e.preventDefault(); upload(e.dataTransfer.files); };
+
+        if (typeof String.prototype.f !== 'function') {
+            String.prototype.f = function() {
+                var args = arguments;
+                var index = 0;
+                var replace = function() {
+                    return args[index++];
+                };
+                return this.replace(/%s/g, replace);
+            };
+        }
+
+
+        function upload(files) {
+            var now = new Date();
+
+            // YYYY/MM
+            var destFolder = (new Date()).toISOString().split("-").slice(0,2).join("/");
+
+            
+            
+            var jqProgresses = jQuery('#upload_progress');
+            var jqUploadList = $("#upload_list").empty();
+
+
+            $(files).each(function(i,file){
+                if (!file) return;
+                var fd = new FormData();
+                fd.append("file", file);
+                fd.append("dest", destFolder);
+
+                var tmpDiv = document.createElement('div');
+                tmpDiv.innerHTML = '<div class="progress progress-striped active"><div class="bar"></div></div>';
+                var jqTmp = jQuery(tmpDiv);
+                var jqProgressBar = jqTmp.find('.bar');
+                jqProgresses.append(tmpDiv);
+
+                var xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(ev) {
+                    if (ev.lengthComputable) {
+                        var percentage = Math.round(ev.loaded * 100 / ev.total);
+                        jqProgressBar.width(percentage + "%");
+                    }
+
+                }, false);
+
+                xhr.open("POST", "/upload");
+                xhr.onload = function() {
+                    console.log(xhr.responseText);
+                    var resp = JSON.parse(xhr.responseText);
+                    if (resp.status === 'ok') {
+                        var html = '<p><a class="uploadUrl" target="_blank" href="%s" data-mimetype="%s">%s</a></p>'.f(resp.url, file.type, resp.name);
+                        jqUploadList.append(html);
+                    } else {
+                        jqUploadList.append('<p>%s : %s</p>'.f(file.name, resp.message));
+                    }
+                    jqTmp.remove();
+                };
+                xhr.send(fd);
+            })
+        }
+
+        $(document).ready(function(){
+            $("#upload_list").on('click', '.uploadUrl', function(ev){
+                var jq = $(this);
+                var href = jq.attr('href');
+                var mimetype = jq.attr('data-mimetype');
+                var markdown_blurb = '[ ](' + href + ')';
+                if (mimetype.match(/image\/.*/)) {
+                    markdown_blurb = '!' + markdown_blurb;
+                }
+                $('#post_content').insertAtCaret(markdown_blurb);
+                ev.preventDefault();
+            })
+        })
+
+         $.fn.extend({
+            insertAtCaret: function(myValue){
+                var obj;
+                if( typeof this[0].name !='undefined' ) obj = this[0];
+                else obj = this;
+
+                if ($.browser.msie) {
+                    obj.focus();
+                    sel = document.selection.createRange();
+                    sel.text = myValue;
+                    obj.focus();
+                }else if ($.browser.mozilla || $.browser.webkit) {
+                    var startPos = obj.selectionStart;
+                    var endPos = obj.selectionEnd;
+                    var scrollTop = obj.scrollTop;
+                    obj.value = obj.value.substring(0, startPos)+myValue+obj.value.substring(endPos,obj.value.length);
+                    obj.focus();
+                    obj.selectionStart = startPos + myValue.length;
+                    obj.selectionEnd = startPos + myValue.length;
+                    obj.scrollTop = scrollTop;
+                } else {
+                    obj.value += myValue;
+                    obj.focus();
+                }
+            }
+        })
+
+
+
+
+    </script>
+
+
+    {% if post.draft %}
+        <script type="text/javascript">
+            function SaveTick(){
+                issueSaveAjax({{ post.id }}, false);
+                setTimeout("SaveTick()", 4000);
+            }
+            $(document).ready(function(){
+                setTimeout("SaveTick();", 10000);
+            })
+        </script>
+    {% endif %}
+
 <script src="{{ url_for('static', filename='js/tabIndent.js') }}"></script>
 <script>
     tabIndent.config.tab = '    ';
