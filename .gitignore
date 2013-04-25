@@ -9,3 +9,4 @@ uploads/
 *.sock
 logs/
 templates/custom-*
+tmp/
