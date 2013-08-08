@@ -28,11 +28,9 @@ from unidecode import unidecode
 from bs4 import BeautifulSoup
 import pytz
 
-try:
-    import pygments
-    from pygments.formatters import HtmlFormatter
-except ImportError:
-    pygments = None
+import pygments
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
 
 
 app = Flask(__name__)
@@ -55,9 +53,6 @@ except Exception, e:
 
 _punct_re = re.compile(r'\W+')
 
-extensions = ['fenced_code', 'toc']
-if pygments is not None:
-    extensions.append('codehilite')
 
 
 markdown_extensions = (
@@ -73,8 +68,35 @@ markdown_flags = (
     misaka.HTML_TOC
 )
 
+class CodeHtmlFormatter(HtmlFormatter):
+    def wrap(self, source, outfile):
+        return self._wrap_code(source)
+    def _wrap_code(self, source):
+        yield 0, '<code class="%s">' % self.cssclass
+        for i, t in source:
+            if i == 1:
+                # it's a line of formatted code
+                t += '<br>'
+            yield i, t
+        yield 0, '</code>'
+
+pygments_formatter = HtmlFormatter(cssclass='codehilite')
+
+# Create a custom renderer
+class BleepRenderer(misaka.HtmlRenderer, misaka.SmartyPants):
+    def block_code(self, text, lang):
+        app.logger.info(lang)
+        if not lang:
+            lang = 'text'
+            #return '\n<pre><code>%s</code></pre>\n' % text.strip()
+        lexer = get_lexer_by_name(lang, stripall=True)
+        return pygments.highlight(text, lexer, pygments_formatter)
+
+markdown_renderer = BleepRenderer(markdown_flags)
+markdown = misaka.Markdown(markdown_renderer, extensions=markdown_extensions)
+
 def markdown_to_html(s):
-    return misaka.html(s, extensions=markdown_extensions, render_flags=markdown_flags)
+    return markdown.render(s)
 
 def current_datetime():
     return datetime.datetime.utcnow()
