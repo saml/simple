@@ -10,3 +10,4 @@ uploads/
 logs/
 templates/custom-*
 tmp/
+build/

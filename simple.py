@@ -14,7 +14,7 @@ import shlex
 import dateutil.parser
 
 # web stuff and markdown imports
-import markdown
+import misaka
 from flask.ext.paginate import Pagination
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash
@@ -59,8 +59,22 @@ extensions = ['fenced_code', 'toc']
 if pygments is not None:
     extensions.append('codehilite')
 
-MARKDOWN_PARSER = markdown.Markdown(extensions=extensions, safe_mode=False,
-                                    output_format="html5")
+
+markdown_extensions = (
+    misaka.EXT_NO_INTRA_EMPHASIS |
+    misaka.EXT_AUTOLINK |
+    misaka.EXT_TABLES |
+    misaka.EXT_FENCED_CODE |
+    misaka.EXT_LAX_HTML_BLOCKS |
+    misaka.EXT_SPACE_HEADERS |
+    misaka.EXT_SUPERSCRIPT
+)
+markdown_flags = (
+    misaka.HTML_TOC
+)
+
+def markdown_to_html(s):
+    return misaka.html(s, extensions=markdown_extensions, render_flags=markdown_flags)
 
 def current_datetime():
     return datetime.datetime.utcnow()
@@ -115,7 +129,7 @@ class Post(db.Model):
         _cached = cache.get("post_%s"%self.id)
         if _cached is not None:
             return _cached
-        text = MARKDOWN_PARSER.convert(self.text) if self.text_type == 'markdown' else self.text
+        text = markdown_to_html(self.text) if self.text_type == 'markdown' else self.text
         cache.set("post_%s"%self.id, text)
         return text
 
