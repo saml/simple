@@ -2,7 +2,7 @@ Flask>=0.10.1
 Flask-SQLAlchemy>=1.0
 Flask-paginate
 Jinja2
-mikasa>=1.0.2
+misaka>=1.0.2
 SQLAlchemy
 Werkzeug
 Pygments

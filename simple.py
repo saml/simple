@@ -14,7 +14,7 @@ import shlex
 import dateutil.parser
 
 # web stuff and markdown imports
-import mikasa
+import misaka
 from flask.ext.paginate import Pagination
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash
@@ -74,7 +74,7 @@ markdown_flags = (
 )
 
 def markdown_to_html(s):
-    return mikasa.html(s, extensions=markdown_extensions, render_flags=markdown_flags)
+    return misaka.html(s, extensions=markdown_extensions, render_flags=markdown_flags)
 
 def current_datetime():
     return datetime.datetime.utcnow()
