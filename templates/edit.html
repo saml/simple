@@ -1,9 +1,10 @@
 {% extends "admin_template.html" %}
 
 {% block css %}
-{#
-    <link href="{{ url_for('static', filename='css/layout.css') }}" type="text/css" media="screen" rel="stylesheet">
-    #}
+<style>
+input { min-width: 100%; font-size: 16pt;}
+textarea { min-width: 100%; font-size: 16pt;}
+</style>
 {% endblock %}
 
 {% block head %}
@@ -11,32 +12,34 @@
 
 
 {% block content %}
-    <div class="container-fluid">
+    <div class="container">
         <form accept-charset="UTF-8" class="edit_post form-horizontal" id="edit_post" method="post">
             <div class="control-group">
-                <label class="control-label">Title</label>
-                <div class="controls">
+                <label class="control-label grid 1of3">Title</label>
+                <div class="controls grid 1of1">
                     <input type="text" class="post_title span8" id="post_title" name="post_title" placeholder="Title here" value="{{ post.title }}">
                 </div>
-                <label class="control-label">{{ config.BLOG_URL }}</label>
-                <div class="controls">
+                <label class="control-label grid 1of3">{{ config.BLOG_URL }}</label>
+                <div class="controls grid 1of1">
                     <input class="span8" type="text" id="post_readable_id" name="post_readable_id" value="{{ post.readable_id or '' }}" />
                 </div>
-                <label class="control-label">Pub Date</label>
-                <div class="controls">
+                <label class="control-label grid 1of3">Pub Date</label>
+                <div class="controls grid 1of1">
                     <input class="span8" type="text" id="post_publish_date" name="post_publish_date" value="{{ post.created_at|iso8601notz }}" />
                 </div>
 
-                <label class="control-label">Content</label>
-                <div class="controls">
-                    <textarea class="span8" cols="40" id="post_content" name="post_content" placeholder="Write post here" rows="20">{{ post.text }}</textarea>
-                </div>
-
-                <label id="auto-save" class="control-label" for="post_draft">Draft</label>
-                <div class="controls">
+                <label id="auto-save" class="control-label grid 1of3" for="post_draft">Draft</label>
+                <div class="controls grid 1of3">
                     <input name="post_draft" type="hidden" value="0" />
                     <input id="post_draft" name="post_draft" type="checkbox" value="1" {% if post.draft %}checked{% endif %} />
                 </div>
+
+                <label class="control-label grid 1of3">Content</label>
+                <div class="controls grid 1of1">
+                    <textarea class="span8" cols="40" id="post_content" name="post_content" placeholder="Write post here" rows="20">{{ post.text }}</textarea>
+                    <div id="post_content_editor"></div>
+                </div>
+
             </div>
             <div class="control-group">
                 <div id="drop-upload" class=" well well-small controls" style="word-wrap: break-word;">
@@ -48,7 +51,7 @@
             </div>
                
         </form>
-        <ul class="nav nav-pills">
+        <ul class="nav nav-pills grid 1of1">
             <li><a href="{{ url_for("admin") }}">Admin</a></li>
             <li><a href="{{ url_for('delete', post_id=post.id, next="admin") }}">Delete</a></li>
             <li>{% if post.draft %}
@@ -63,6 +66,7 @@
 
 
 {% block body_end %}
+
     <script>
         window.ondragover = function(e) {e.preventDefault()};
         window.ondrop = function(e) {e.preventDefault(); upload(e.dataTransfer.files); };
@@ -108,6 +112,7 @@
                     if (ev.lengthComputable) {
                         var percentage = Math.round(ev.loaded * 100 / ev.total);
                         jqProgressBar.width(percentage + "%");
+                        jqProgressBar.html(percentage+"%");
                     }
 
                 }, false);

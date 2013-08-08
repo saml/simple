@@ -1,0 +1,143 @@
+body {
+	background: #111;
+	color: #cdc;
+	margin: 0;
+}
+
+.header h1 {
+	font-size: 5em;
+	font-weight: 321;
+	margin: 0 auto;
+	position: relative;
+	max-width: 800px;
+}
+
+a {
+	text-decoration: none;
+}
+
+.header {
+	background: #333;
+	color: #fff;
+	padding: 0 0 0.5em 8px;
+}
+
+.project {
+	color: #cedbde;
+	display: block;
+	padding: 0 0 0.5em 8px;
+}
+.project:hover {
+	color: #fff;
+}
+
+body.blue .header, .project.blue:hover {
+	background: #1793d1;
+}
+body.purple .header, .project.purple:hover {
+	background: #875fff;
+}
+body.green .header, .project.green:hover {
+	background: #5dd030;
+}
+body.red .header, .project.red:hover {
+	background: #ff2954;
+}
+body.yellow .header, .project.yellow:hover {
+	background: #f1d910;
+}
+
+.body {
+	font-size: 14px;
+	line-height: 150%;
+	margin: 0 auto;
+	max-width: 500px;
+	padding: 0 8px;
+}
+
+body.blue h2, body.blue .body a {
+	color: #1793d1;
+}
+body.purple h2, body.purple .body a {
+	color: #875fff;
+}
+body.green h2, body.green .body a {
+	color: #5dd030;
+}
+body.red h2, body.red .body a {
+	color: #ff2954;
+}
+body.yellow h2, body.yellow .body a {
+	color: #f1d910;
+}
+
+h2 {
+	font-family: "Open Sans", "Segoe WP", sans-serif;
+	font-size: 2em;
+	font-weight: 300;
+	margin: 1.5em 0 0.5em;
+}
+
+.codes {
+	border-top: 1px #333 dotted;
+	margin-top: 0.5em;
+	padding-top: 0.5em;
+}
+
+.file {
+	color: #666;
+	font-size: 11px;
+}
+
+.code {
+	margin: 0 0 1.5em;
+}
+.code.last {
+	margin-bottom: 0;
+}
+
+.code pre {
+	font-size: 12px;
+	margin: 0;
+	overflow-x: auto;
+}
+
+.footer {
+	color: #333;
+	font-size: 12px;
+	margin: 3em auto;
+	padding: 0 8px;
+	text-align: right;
+	max-width: 500px;
+}
+
+@media all and ( max-width: 516px ) {
+	h1 {
+		overflow: hidden;
+		max-width: 100%;
+	}
+}
+
+@media all and ( min-width: 720px ) {
+	.file {
+		left: -212px;
+		position: relative;
+		text-align: right;
+		width: 200px;
+	}
+
+	.code {
+		margin-top: -1.5em;
+	}
+}
+
+.code .Separators { color: #585858; }
+.code .Number { color: #d70087; }
+.code .Ops { color: #875fff; }
+.code .Constant { color: #ffd700; }
+.code .Braces { color: #666; }
+.code .Comment { color: #8a8a8a; }
+.code .Statement { color: #0087ff; font-weight: bold; }
+.code .luaFunction { color: #ffffff; font-weight: bold; }
+.code .Operator { color: #ffaf00; font-weight: bold; }
+.code .Number { color: #d70087; }

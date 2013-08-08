@@ -40,7 +40,6 @@ app.config.from_object('settings')
 app.secret_key = app.config["SECRET_KEY"]
 
 UPLOAD_FOLDER = 'uploads/'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'ogg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 CACHE_FLUSH_COMMAND = app.config['CACHE_FLUSH_COMMAND'].strip()
 BEGINNING_SLASH = re.compile(r'^/+')
@@ -380,8 +379,7 @@ def preview(post_id):
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return True
 
 def refresh_cache(urls, dryrun=not CACHE_FLUSH_COMMAND):
     app.logger.debug('flush: %s' % urls)
