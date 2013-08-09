@@ -111,7 +111,7 @@
 
                 }, false);
 
-                xhr.open("POST", "/upload");
+                xhr.open("POST", "{{ url_for('upload_file') }}");
                 xhr.onload = function() {
                     console.log(xhr.responseText);
                     var resp = JSON.parse(xhr.responseText);
