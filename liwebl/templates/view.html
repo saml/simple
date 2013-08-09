@@ -16,14 +16,15 @@
 
 {% block content %}
     <section id="post-{{ post.id }}">
-        <div class="post_container {{ 'ui360' if has_audio }}">
+        <article>
             <div class="post_header">
                 <h1>{{ post.title }}</h1>
-                <time datetime="{{ post.created_at|iso8601 }}">{{ post.created_at|datetimeformat }}</time>
+                Created: <time datetime="{{ post.created_at|iso8601 }}">{{ post.created_at|datetimeformat }}</time><br />
+                Updated: <time datetime="{{ post.updated_at|iso8601 }}">{{ post.updated_at|datetimeformat }}</time><br />
             </div>
             <br/>
-            {{ post.render_content()|safe }}
-        </div>
+            {{ post|render_post|safe }}
+        </article>
 
         {% if config.DISQUS_SHORTNAME and not post.draft %}
             <br/><br/>
@@ -48,6 +49,19 @@
 {% endblock %}
 
 {% block body_end %}
+<script>
+    (function() {
+        var times = document.getElementsByTagName('time');
+        var n = times.length;
+        for (var i = 0; i < n; i++) {
+            var x = times[i];
+            var utcStr = x.getAttribute('datetime');
+            if (utcStr) {
+                x.innerHTML = new Date(utcStr);
+            }
+        }
+    }());
+</script>
     {% if has_audio %}
         <script src="{{ url_for('static', filename='js/berniecode-animator.js') }}"></script>
         <script src="{{ url_for('static', filename='js/sm2.js') }}"></script>

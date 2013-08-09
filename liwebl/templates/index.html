@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}<title>{{ config.BLOG_TITLE }}</title>{% endblock %}
+
+{% block content %}
+    {{ pagination.info|safe }}
+    {{ pagination.links|safe }}
+    {% for post in posts %}
+        <section id="post-{{ post.id }}" class="grid 1of1">
+            <div class="post_header">
+                <h1><a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}">{{ post.title }}</a></h1>
+            </div>
+            <p>Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
+        </section>
+    {% endfor %}
+    {{ pagination.links|safe }}
+{% endblock %}

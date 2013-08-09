@@ -1,67 +1,61 @@
 {% extends "admin_template.html" %}
 
-{% block css %}
-<style>
-input { min-width: 100%; font-size: 16pt;}
-textarea { min-width: 100%; font-size: 16pt;}
-</style>
-{% endblock %}
-
-{% block head %}
-{% endblock %}
-
-
 {% block content %}
-    <div class="container">
-        <form accept-charset="UTF-8" class="edit_post form-horizontal" id="edit_post" method="post">
-            <div class="control-group">
-                <label class="control-label grid 1of3">Title</label>
-                <div class="controls grid 1of1">
-                    <input type="text" class="post_title span8" id="post_title" name="post_title" placeholder="Title here" value="{{ post.title }}">
-                </div>
-                <label class="control-label grid 1of3">{{ config.BLOG_URL }}</label>
-                <div class="controls grid 1of1">
-                    <input class="span8" type="text" id="post_readable_id" name="post_readable_id" value="{{ post.readable_id or '' }}" />
-                </div>
-                <label class="control-label grid 1of3">Pub Date</label>
-                <div class="controls grid 1of1">
-                    <input class="span8" type="text" id="post_publish_date" name="post_publish_date" value="{{ post.created_at|iso8601notz }}" />
-                </div>
-
-                <label id="auto-save" class="control-label grid 1of3" for="post_draft">Draft</label>
-                <div class="controls grid 1of3">
-                    <input name="post_draft" type="hidden" value="0" />
-                    <input id="post_draft" name="post_draft" type="checkbox" value="1" {% if post.draft %}checked{% endif %} />
-                </div>
-
-                <label class="control-label grid 1of3">Content</label>
-                <div class="controls grid 1of1">
-                    <textarea class="span8" cols="40" id="post_content" name="post_content" placeholder="Write post here" rows="20">{{ post.text }}</textarea>
-                    <div id="post_content_editor"></div>
-                </div>
-
+    <form accept-charset="UTF-8" class="edit_post form-horizontal" id="edit_post" method="post">
+        <div class="control-group">
+            <label class="control-label grid 1of3">Title</label>
+            <div class="controls grid 1of1">
+                <input type="text" class="post_title span8" id="post_title" name="title" placeholder="Title here" value="{{ post.title }}">
             </div>
-            <div class="control-group">
-                <div id="drop-upload" class=" well well-small controls" style="word-wrap: break-word;">
-                    Drag files here to upload. Click to insert.
-                    <input type="file" onchange="upload(this.files[0])">
-                    <div id="upload_progress"></div>
-                    <div id="upload_list"></div>
-                </div>
+            <label class="control-label grid 1of3">{{ config.BLOG_URL }}</label>
+            <div class="controls grid 1of1">
+                <input class="span8" type="text" id="post_readable_id" name="readable_id" value="{{ post.readable_id or '' }}" />
             </div>
-               
-        </form>
-        <ul class="nav nav-pills grid 1of1">
-            <li><a href="{{ url_for("admin") }}">Admin</a></li>
-            <li><a href="{{ url_for('delete', post_id=post.id, next="admin") }}">Delete</a></li>
-            <li>{% if post.draft %}
-                <a href="{{ url_for('preview', post_id=post.id) }}" target="previewPage" onclick="issueSaveAjax({{ post.id }})">Preview</a>
-            {% else %}
-                <a href="{{  url_for('view_post_slug', readable_id=post.readable_id) }}" target="_blank">View live</a>
-            {% endif %}</li>
-            <li><button class="btn btn-success" onclick="$('#edit_post').submit()">Save</button></li>
-        </ul>
-    </div>
+            <label class="control-label grid 1of3">Pub Date</label>
+            <div class="controls grid 1of1">
+                <input class="span8" type="text" id="post_publish_date" name="created_at" value="{{ post.created_at|iso8601notz }}" />
+            </div>
+
+            <label id="auto-save" class="control-label grid 1of3" for="draft">Draft</label>
+            <div class="controls grid 1of3">
+                <input id="post_draft" name="draft" type="checkbox" value="1" {% if post.draft %}checked{% endif %} />
+            </div>
+
+            <label class="control-label grid 1of3">Content Type</label>
+            <div class="controls grid 1of3">
+                <select name="text_type">
+                    <option value="markdown" {% if post.text_type == "markdown" %}selected{% endif %}>Markdown</option>
+                    <option value="html" {% if post.text_type == "html" %}selected{% endif %}>Html</option>
+                </select>
+            </div>
+
+            <label class="control-label grid 1of3">Content</label>
+            <div class="controls grid 1of1">
+                <textarea class="span8" cols="40" id="post_content" name="text" placeholder="Write post here" rows="20">{{ post.text }}</textarea>
+                <div id="post_content_editor"></div>
+            </div>
+
+        </div>
+        <div class="control-group">
+            <div id="drop-upload" class=" well well-small controls" style="word-wrap: break-word;">
+                Drag files here to upload. Click to insert.
+                <input type="file" onchange="upload(this.files[0])">
+                <div id="upload_progress"></div>
+                <div id="upload_list"></div>
+            </div>
+        </div>
+           
+    </form>
+    <ul class="nav nav-pills grid 1of1">
+        <li><a href="{{ url_for("new_post") }}">Admin</a></li>
+        <li><a href="{{ url_for('delete', post_id=post.id, next="admin") }}">Delete</a></li>
+        <li>{% if post.draft %}
+            <a href="{{ url_for('preview', post_id=post.id) }}" target="previewPage" onclick="issueSaveAjax({{ post.id }})">Preview</a>
+        {% else %}
+            <a href="{{  url_for('view_post_slug', readable_id=post.readable_id) }}" target="_blank">View live</a>
+        {% endif %}</li>
+        <li><button class="btn btn-success" onclick="$('#edit_post').submit()">Save</button></li>
+    </ul>
 {% endblock %}
 
 
