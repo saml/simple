@@ -23,7 +23,7 @@ def slugify(text, delim=u'-', encoding='utf-8'):
         text = unicode(text, encoding=encoding)
     return NON_WORD.sub(delim, unidecode(text).lower())
 
-def get_readable_id(publish_date, title, post_id):
+def get_readable_id(publish_date, title):
     readable_id = '%s/%s' % (publish_date.strftime('%Y/%m'), slugify(title))
     return readable_id
 

@@ -37,7 +37,7 @@
 
                     {% if config.get('POST_CONTENT_ON_HOMEPAGE',True) %}
                         <br/>
-                        {{ post.render_content()|safe }}
+                        {{ post|render_post|safe }}
                     {% else %}
                         <p style="color: #999;">Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
                     {% endif %}

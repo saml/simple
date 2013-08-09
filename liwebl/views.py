@@ -5,12 +5,12 @@ from auth import requires_authentication, is_admin
 import contents
 from utils import current_datetime, refresh_cache, slugify
 from forms import parse_form_for_post
+from renderers import markdown_to_html
 
 from flask import render_template, \
         request, flash, redirect, url_for, \
         abort, jsonify, Response, make_response, send_from_directory
 from flask.ext.paginate import Pagination
-
 
 
 @app.route("/")
@@ -103,7 +103,6 @@ def save_post(post_id):
 def preview(post_id):
     post = contents.get_post_by_id(post_id)
     if post is None:
-        return abort(404)
         return abort(404)
     return render_template("view.html", post=post, preview=True)
 

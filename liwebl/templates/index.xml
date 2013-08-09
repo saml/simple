@@ -8,7 +8,7 @@
         {% set p_url=config.BLOG_URL + url_for('view_post_slug', readable_id=post.readable_id) %}
         <item>
             <title>{{ post.title }}</title>
-            <description>{{ post.render_content() }}</description>
+            <description>{{ post|render_post }}</description>
             <pubDate>{{ post.created_at|datetimeformat('%b %d, %Y') }}</pubDate>
             <link>{{ p_url }}</link>
             <guid>{{ p_url }}</guid>

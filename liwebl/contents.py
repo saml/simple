@@ -1,6 +1,6 @@
 from liwebl import app, db
 from models import Post
-from utils import current_datetime
+from utils import current_datetime, get_readable_id
 
 def query_posts_paginated(page=1, draft=None, per_page=app.config['POSTS_PER_PAGE']):
     post_query = db.session.query(Post)
@@ -33,6 +33,7 @@ def save_post(post):
 def new_post(title):
     post = Post(title=title)
     post.created_at = current_datetime()
+    post.readable_id = get_readable_id(post.created_at, title)
     return save_post(post)
 
 #def old_url_of(fn):

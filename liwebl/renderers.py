@@ -61,4 +61,9 @@ def format_iso8601(date):
         return ''
     return pytz.utc.localize(date).isoformat()
     
+def render_post(post):
+    if post.text_type == 'markdown':
+        return markdown_to_html(post.text)
+    return post.text
+
 

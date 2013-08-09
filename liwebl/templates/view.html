@@ -22,7 +22,7 @@
                 <time datetime="{{ post.created_at|iso8601 }}">{{ post.created_at|datetimeformat }}</time>
             </div>
             <br/>
-            {{ post.render_content()|safe }}
+            {{ post|render_post|safe }}
         </div>
 
         {% if config.DISQUS_SHORTNAME and not post.draft %}
