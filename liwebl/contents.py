@@ -2,8 +2,11 @@ from liwebl import app, db
 from models import Post
 from utils import current_datetime
 
-def query_posts_paginated(page=1, draft=False, per_page=app.config['POSTS_PER_PAGE']):
-    all_posts = db.session.query(Post).filter_by(draft=draft).order_by(Post.created_at.desc())
+def query_posts_paginated(page=1, draft=None, per_page=app.config['POSTS_PER_PAGE']):
+    post_query = db.session.query(Post)
+    if draft is not None:
+        post_query = post_query.filter_by(draft=draft)
+    all_posts = post_query.order_by(Post.created_at.desc())
     total = all_posts.count()
     query = all_posts.limit(per_page).offset((page - 1) * int(per_page))
     result = query.all()
@@ -21,9 +24,30 @@ def get_post_by_id(numeric_id):
     except:
         return None
 
-def new_post(title):
-    post = Post(title=title)
-    post.created_at = current_datetime()
+
+def save_post(post):
     db.session.add(post)
     db.session.commit()
     return post
+
+def new_post(title):
+    post = Post(title=title)
+    post.created_at = current_datetime()
+    return save_post(post)
+
+#def old_url_of(fn):
+#    @wraps(fn)
+#    def _old_url_of(post):
+#        was_draft = post.draft
+#        old_url = full_url_of(post)
+#        return fn()
+#    return _old_url_of
+
+def delete_post(post):
+    was_draft = post.draft
+    old_url = full_url_of(post)
+    db.session.delete(post)
+    db.session.commit()
+    if not was_draft:
+        return old_url
+    return None
