@@ -4,6 +4,7 @@ from liwebl import app, db
 from auth import requires_authentication, is_admin
 import contents
 from utils import current_datetime, refresh_cache, slugify
+from forms import parse_form_for_post
 
 from flask import render_template, \
         request, flash, redirect, url_for, \
@@ -42,7 +43,7 @@ def new_post():
         posts,count,total = contents.query_posts_paginated(page)
         pagination = Pagination(count, page=page, total=total, 
                 record_name='posts', search=False, per_page=app.config['POSTS_PER_PAGE'])
-        return render_template("admin.html", posts=posts, pagination = pagination)
+        return render_template("admin.html", posts=posts, pagination=pagination)
 
     title = request.form.get('title', 'untitled')
     post = contents.new_post(title)

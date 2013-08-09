@@ -1,7 +1,6 @@
 {% extends "admin_template.html" %}
 
 {% block css %}
-<link href="{{ url_for('static', filename='css/posts.css') }}" type="text/css" media="screen" rel="stylesheet">
 {% endblock %}
 
 {% block head %}
@@ -21,13 +20,36 @@
 {% endblock %}
 
 {% block content %}
+    <form action="{{ url_for('new_post') }}" method="POST">
+        Title: <input class="grid 1of3" name="title" id="post_title" type="text" placeholder="Start typing an idea here">
+        <input type="submit" value="Save" />
+    </form>
 
+    {{ pagination.info|safe }}
+    {{ pagination.links|safe }}
+    {% for post in posts %}
+        <div class="row-fluid">
+            <div class="span12">
+                <section id="post-{{ post.id }}">
+                    <div class="post_header">
+                        <h1><a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}">{{ post.title }}</a></h1>
+                    </div>
+
+                    {% if config.get('POST_CONTENT_ON_HOMEPAGE',True) %}
+                        <br/>
+                        {{ post.render_content()|safe }}
+                    {% else %}
+                        <p style="color: #999;">Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
+                    {% endif %}
+                </section>
+            </div>
+        </div>
+
+    {% endfor %}
+    {{ pagination.links|safe }}
 
 <div id="drafts" class="col">
     <h1>Drafts <a href="{{ url_for('new_post') }}" class="button">New draft</a></h1>
-    <form action="{{ url_for('new_post') }}" method="POST">
-        <input name="title" id="post_title" type="text" size=30 placeholder="Start typing an idea here">
-    </form>
     <ul>
         {% for draft in drafts %}
             <li id="post-{{ draft.id }}">

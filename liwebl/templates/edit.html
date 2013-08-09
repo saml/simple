@@ -52,7 +52,7 @@ textarea { min-width: 100%; font-size: 16pt;}
                
         </form>
         <ul class="nav nav-pills grid 1of1">
-            <li><a href="{{ url_for("admin") }}">Admin</a></li>
+            <li><a href="{{ url_for("new_post") }}">Admin</a></li>
             <li><a href="{{ url_for('delete', post_id=post.id, next="admin") }}">Delete</a></li>
             <li>{% if post.draft %}
                 <a href="{{ url_for('preview', post_id=post.id) }}" target="previewPage" onclick="issueSaveAjax({{ post.id }})">Preview</a>
