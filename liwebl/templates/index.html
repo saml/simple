@@ -6,23 +6,12 @@
     {{ pagination.info|safe }}
     {{ pagination.links|safe }}
     {% for post in posts %}
-        <div class="row-fluid">
-            <div class="span12">
-                <section id="post-{{ post.id }}">
-                    <div class="post_header">
-                        <h1><a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}">{{ post.title }}</a></h1>
-                    </div>
-
-                    {% if config.get('POST_CONTENT_ON_HOMEPAGE',True) %}
-                        <br/>
-                        {{ post|render_post|safe }}
-                    {% else %}
-                        <p style="color: #999;">Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
-                    {% endif %}
-                </section>
+        <section id="post-{{ post.id }}" class="grid 1of1">
+            <div class="post_header">
+                <h1><a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}">{{ post.title }}</a></h1>
             </div>
-        </div>
-
+            <p>Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
+        </section>
     {% endfor %}
     {{ pagination.links|safe }}
 {% endblock %}

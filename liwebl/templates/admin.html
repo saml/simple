@@ -1,30 +1,11 @@
 {% extends "admin_template.html" %}
 
-{% block css %}
-{% endblock %}
-
-{% block head %}
-<style>
-    a, a:visited, a:active {
-        color: #000;
-        text-decoration: none;
-    }
-    a:hover, a:focus {
-        color: red; 
-        text-decoration: none;
-    }
-    a.button{
-        color:#fff;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
     <form action="{{ url_for('new_post') }}" method="POST">
-        Title: <input class="grid 1of3" name="title" id="post_title" type="text" placeholder="Start typing an idea here">
-        <input type="submit" value="Save" />
+        <input class="grid 1of3" name="title" id="post_title" type="text" placeholder="Start typing an idea here">
+        <input type="submit" value="New Post" />
     </form>
-
+    <hr />
     {{ pagination.info|safe }}
     {{ pagination.links|safe }}
     {% for post in posts %}
@@ -32,57 +13,13 @@
             <div class="span12">
                 <section id="post-{{ post.id }}">
                     <div class="post_header">
-                        <h1><a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}">{{ post.title }}</a></h1>
+                        <h1><a href="{{ url_for('edit', post_id=post.id) }}">{% if post.draft %}[Draft] {% endif %}{{ post.title }}</a></h1>
                     </div>
-
-                    {% if config.get('POST_CONTENT_ON_HOMEPAGE',True) %}
-                        <br/>
-                        {{ post|render_post|safe }}
-                    {% else %}
-                        <p style="color: #999;">Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
-                    {% endif %}
+                    <p>Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
                 </section>
             </div>
         </div>
 
     {% endfor %}
     {{ pagination.links|safe }}
-
-<div id="drafts" class="col">
-    <h1>Drafts <a href="{{ url_for('new_post') }}" class="button">New draft</a></h1>
-    <ul>
-        {% for draft in drafts %}
-            <li id="post-{{ draft.id }}">
-                <h3>
-                    <a href="{{ url_for('edit', post_id=draft.id) }}">{{ draft.title }}</a>
-                        <span class="links">
-                            <a href="{{ url_for('delete', post_id=draft.id) }}" class="admin-delete" data-confirm="Are you sure?" rel="nofollow">x</a>
-                        </span>
-                </h3>
-            </li>
-        {% endfor %}
-    </ul>
-</div>
-
-<div id="published" class="col">
-    <h2>Published <a href="{{ url_for('index') }}">Home</a></h2>
-    {{ pagination.info|safe }}
-    {{ pagination.links|safe }}
-    <ul>
-        {% for post in posts %}
-            <li id="post-{{ post.id }}">
-                <h3>
-                    <a href="{{ url_for('edit', post_id=post.id) }}">{{ post.title }}</a>
-                        <span class="links">
-                            <a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}" class="admin-view">view</a>
-                            <a href="{{ url_for('delete', post_id=post.id) }}" class="admin-delete" data-confirm="Are you sure?"
-                               data-method="delete" rel="nofollow">x</a>
-                        </span>
-                </h3>
-            </li>
-        {% endfor %}
-    </ul>
-    {{ pagination.links|safe }}
-</div>
-
 {% endblock %}

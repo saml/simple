@@ -51,7 +51,9 @@ def markdown_to_html(s):
 def format_datetime(date, format='%Y-%m-%d %I:%m %p %Z'):
     if not date:
         return ''
-    return pytz.utc.localize(date).strftime(format)
+    if not date.tzinfo:
+        date = date.replace(tzinfo=pytz.utc)
+    return date.strftime(format)
 
 def format_iso8601_notz(date):
     return format_datetime(date, '%Y-%m-%dT%H:%M:%S')
@@ -59,7 +61,9 @@ def format_iso8601_notz(date):
 def format_iso8601(date):
     if not date:
         return ''
-    return pytz.utc.localize(date).isoformat()
+    if not date.tzinfo:
+        date = date.replace(tzinfo=pytz.utc)
+    return date.isoformat()
     
 def render_post(post):
     if post.text_type == 'markdown':
