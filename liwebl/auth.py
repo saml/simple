@@ -10,7 +10,7 @@ def is_admin():
     if authorization and \
             authorization.username == app.config['ADMIN_USERNAME'] and \
             check_password_hash(app.config['ADMIN_PASSWORD'], authorization.password):
-        return TRue
+        return True
     return False
 
 def requires_authentication(func):

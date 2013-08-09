@@ -1,4 +1,4 @@
 #!/usr/bin/env python2
-import simple
-simple.app.debug = True
-simple.app.run()
+import liwebl
+liwebl.app.debug = True
+liwebl.app.run()

@@ -3,8 +3,6 @@ import pygments
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 
-from liwebl import app
-
 import pytz
 
 markdown_extensions = (
@@ -37,7 +35,6 @@ pygments_formatter = HtmlFormatter(cssclass='codehilite')
 # Create a custom renderer
 class BleepRenderer(misaka.HtmlRenderer, misaka.SmartyPants):
     def block_code(self, text, lang):
-        app.logger.info(lang)
         if not lang:
             lang = 'text'
         lexer = get_lexer_by_name(lang, stripall=True)
@@ -64,10 +61,4 @@ def format_iso8601(date):
         return ''
     return pytz.utc.localize(date).isoformat()
     
-
-if not app.jinja_env.filters.has_key('datetimeformat'):
-    app.jinja_env.filters['datetimeformat'] = format_datetime
-    app.jinja_env.filters['iso8601notz'] = format_iso8601_notz
-    app.jinja_env.filters['iso8601'] = format_iso8601
-
 
