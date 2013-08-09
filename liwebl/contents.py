@@ -1,5 +1,6 @@
 from liwebl import app, db
 from models import Post
+from utils import current_datetime
 
 def query_posts_paginated(page=1, draft=False, per_page=app.config['POSTS_PER_PAGE']):
     all_posts = db.session.query(Post).filter_by(draft=draft).order_by(Post.created_at.desc())
@@ -22,6 +23,7 @@ def get_post_by_id(numeric_id):
 
 def new_post(title):
     post = Post(title=title)
+    post.created_at = current_datetime()
     db.session.add(post)
     db.session.commit()
     return post

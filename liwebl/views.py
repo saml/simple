@@ -3,16 +3,14 @@
 from liwebl import app, db
 from auth import requires_authentication, is_admin
 import contents
+from utils import current_datetime
 
 from flask import render_template, \
         request, flash, redirect, url_for, \
         abort, jsonify, Response, make_response
 from flask.ext.paginate import Pagination
 
-import datetime
 
-def current_datetime():
-    return datetime.datetime.utcnow()
 
 @app.route("/")
 def index():
@@ -54,47 +52,20 @@ def edit(post_id):
     if request.method == "GET":
         return render_template("edit.html", post=post)
 
-    was_initially_published = not post.draft
-
     urls_to_flush = []
+    was_initially_published = not post.draft
+    if was_initially_published:
+        urls_to_flush.append(full_url_of(post))
+
     post_content = request.form.get("post_content", "")
 
     post.set_content(post_content)
     post.updated_at = current_datetime()
 
-    publish_date = request.form.get('post_publish_date', '').strip()
-    if len(publish_date) > 0:
-        publish_date = dateutil.parser.parse(publish_date + 'Z') #UTC everywhere
-        if publish_date.tzinfo:
-            publish_date = publish_date.astimezone(pytz.utc).replace(tzinfo = None)
-    else:
-        publish_date = None
-
-
     recalculate_readable_id = False
 
-    if publish_date and post.created_at != publish_date:
-        post.created_at = publish_date
-        recalculate_readable_id = True
-
-    if any(request.form.getlist("post_draft", type=int)):
-        post.draft = True
-    else:
-        #user wants to publish
-        if post.draft:
-            post.draft = False
-            if not post.created_at:
-                post.created_at = current_datetime()
-                post.updated_at = post.created_at
-                recalculate_readable_id = True
-
-    if post.title != request.form.get("post_title", ""):
-        post.title = request.form.get("post_title", "")
-        recalculate_readable_id = True
-
-    if was_initially_published:
-        urls_to_flush.append(full_url_of(post))
-
+    post.draft = any(request.form.getlist("post_draft", type=int))
+    post.title = request.form.get("post_title", "")
     readable_id = request.form.get("post_readable_id", "")
 
     if post.readable_id and (post.readable_id != readable_id):
