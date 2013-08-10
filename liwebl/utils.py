@@ -15,6 +15,8 @@ def current_datetime():
     return datetime.datetime.utcnow()
 
 def full_url_of(post):
+    if post.readable_id is None:
+        return None
     path = BEGINNING_SLASH.sub('', url_for('view_post_slug', readable_id=post.readable_id))
     return os.path.join(app.config['BLOG_URL'], path)
 

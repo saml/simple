@@ -48,9 +48,13 @@
     </form>
     <ul class="nav nav-pills grid 1of1">
         <li><a href="{{ url_for("new_post") }}">Admin</a></li>
-        <li><a href="{{ url_for('delete', post_id=post.id, next="admin") }}">Delete</a></li>
+        <li>
+            <form method="POST" action="{{ url_for('delete', post_id=post.id, next=url_for('new_post')) }}">
+                <input class="confirm" type="submit" value="Delete" />
+            </form>
+        </li>
         <li>{% if post.draft %}
-            <a href="{{ url_for('preview', post_id=post.id) }}" target="previewPage" onclick="issueSaveAjax({{ post.id }})">Preview</a>
+            <a href="{{ url_for('preview', post_id=post.id) }}" target="previewPage">Preview</a>
         {% else %}
             <a href="{{  url_for('view_post_slug', readable_id=post.readable_id) }}" target="_blank">View live</a>
         {% endif %}</li>
@@ -138,8 +142,11 @@
                 }
                 $('#post_content').insertAtCaret(markdown_blurb);
                 ev.preventDefault();
-            })
-        })
+            });
+            $('input.confirm').on('click', function() {
+                return window.confirm('Really delete?');
+            }).css('min-width', null);
+        });
 
          $.fn.extend({
             insertAtCaret: function(myValue){
@@ -175,14 +182,36 @@
 
 
     {% if post.draft %}
-        <script type="text/javascript">
-            function SaveTick(){
-                issueSaveAjax({{ post.id }}, false);
-                setTimeout("SaveTick()", 4000);
-            }
-            $(document).ready(function(){
-                setTimeout("SaveTick();", 10000);
-            })
+        <script>
+            (function() {
+                function issueSaveAjax(){
+                    if (!isActive){
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url:"{{ url_for('save_post', post_id=post.id) }}",
+                        data: $('#edit_post').serialize()
+                    });
+                }
+
+                var isActive = true;
+
+                $(window).focus(function(){
+                    isActive = true;
+                    $("#auto-save").css('color','').text('Draft');
+                }).blur(function(){
+                    isActive = false;
+                    $("#auto-save").css('color','red').text('Draft *');
+                });
+
+                $(document).ready(function(){
+                    window.setTimeout(function() {
+                        window.setInterval(issueSaveAjax, 4000);
+                    }, 10000);
+                });
+            }());
         </script>
     {% endif %}
 

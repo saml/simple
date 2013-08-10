@@ -1,6 +1,6 @@
 from liwebl import app, db
 from models import Post
-from utils import current_datetime, get_readable_id
+from utils import current_datetime, get_readable_id, full_url_of
 
 def query_posts_paginated(page=1, draft=None, per_page=app.config['POSTS_PER_PAGE']):
     post_query = db.session.query(Post)

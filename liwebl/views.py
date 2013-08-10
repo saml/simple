@@ -78,7 +78,7 @@ def delete(post_id):
         return flash("Cannot find post id: %d for deletion" % post_id, category="error")
 
     old_url = contents.delete_post(post)
-    if not old_url:
+    if old_url:
         refresh_cache([old_url])
 
     return redirect(request.args.get("next", "")
