@@ -12,7 +12,7 @@ BEGINNING_SLASH = re.compile(r'^/+')
 NON_WORD = re.compile(r'\W+')
 
 def current_datetime():
-    return datetime.datetime.utcnow().replace(microsecond=0)
+    return datetime.datetime.utcnow()
 
 def full_url_of(post):
     if post.readable_id is None:

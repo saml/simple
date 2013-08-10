@@ -63,7 +63,7 @@ def format_iso8601(date):
         return ''
     if not date.tzinfo:
         date = date.replace(tzinfo=pytz.utc)
-    return date.isoformat()
+    return date.replace(microsecond=0).isoformat()
     
 def render_post(post):
     if post.text_type == 'markdown':
