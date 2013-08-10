@@ -32,23 +32,21 @@
                 </ul>
             </footer>
         </div>
-
-        {% if config["ANALYTICS_ID"]  %}
-            <script type="text/javascript">
-
-              var _gaq = _gaq || [];
-              _gaq.push(['_setAccount', '{{ config["ANALYTICS_ID"] }}']);
-              _gaq.push(['_trackPageview']);
-
-              (function() {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-              })();
-
-            </script>
-        {% endif %}
-
         {% block body_end %}{% endblock %}
+<script type="text/javascript">
+var sc_project=9162141; 
+var sc_invisible=0; 
+var sc_security="0397ea67"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost+
+"statcounter.com/counter/counter.js'></"+"script>");
+</script>
+<noscript><div class="statcounter"><a title="web analytics"
+href="http://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="http://c.statcounter.com/9162141/0/0397ea67/0/"
+alt="web analytics"></a></div></noscript>
     </body>
 </html>
