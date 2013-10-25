@@ -3,6 +3,7 @@
 {% block title %}<title>{{ config.BLOG_TITLE }}</title>{% endblock %}
 
 {% block content %}
+<div class="index content">
     {{ pagination.info|safe }}
     {{ pagination.links|safe }}
     {% for post in posts %}
@@ -14,4 +15,5 @@
         </section>
     {% endfor %}
     {{ pagination.links|safe }}
+</div>
 {% endblock %}

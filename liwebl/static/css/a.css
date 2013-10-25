@@ -50,9 +50,12 @@ img {
   max-width:100%;
 }
 
+.index section {
+    max-width: 20em;
+}
 section {
   float:right;
-  padding-bottom:50px;
+  padding:50px;
 }
 
 .codehilite .hll { background-color: #ffffcc }

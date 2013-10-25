@@ -15,6 +15,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="article content">
     <section id="post-{{ post.id }}">
         <article>
             <div class="post_header">
@@ -26,6 +27,7 @@
             {{ post|render_post|safe }}
         </article>
     </section>
+</div>
 {% endblock %}
 
 {% block body_end %}

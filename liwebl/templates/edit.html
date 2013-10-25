@@ -1,6 +1,7 @@
 {% extends "admin_template.html" %}
 
 {% block content %}
+<div class="content">
     <form accept-charset="UTF-8" class="edit_post form-horizontal" id="edit_post" method="post">
         <div class="control-group">
             <label class="control-label grid 1of3">Title</label>
@@ -60,6 +61,7 @@
         {% endif %}</li>
         <li><button class="btn btn-success" onclick="$('#edit_post').submit()">Save</button></li>
     </ul>
+</div>
 {% endblock %}
 
 
