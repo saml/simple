@@ -21,11 +21,16 @@ section {
   padding: 0 32px;
 }
 
-.pagination li, .nav li {
+.pagination li {
   display: inline;
   border: 1px solid #ddd;
   padding: 6px 12px;
   margin-left: -1px;
+}
+.nav li {
+  display: inline-block;
+  border-bottom: 1px solid #ddd;
+  padding: 6px 12px;
 }
 
 .codehilite .hll { background-color: #ffffcc }
