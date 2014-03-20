@@ -39,7 +39,10 @@
             var x = times[i];
             var utcStr = x.getAttribute('datetime');
             if (utcStr) {
-                x.innerHTML = new Date(utcStr);
+                var datetime = new Date(utcStr);
+                if (datetime.getDate() && typeof datetime.toLocaleString === 'function') {
+                    x.innerHTML = datetime.toLocaleString();
+                }
             }
         }
     }());
