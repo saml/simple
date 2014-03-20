@@ -14,7 +14,7 @@
             <footer class="nav">
                 <ul>
                     <li>
-                        <a class="brand" href="{{ url_for('index') }}">{{ config.BLOG_TITLE or "Home" }}
+                        <a class="brand" href="{{ url_for('.index') }}">{{ config.BLOG_TITLE or "Home" }}
                             {% if config.BLOG_TAGLINE %}
                                 <br />
                                 <small><em>{{ config.BLOG_TAGLINE }}</em></small>
@@ -23,7 +23,7 @@
                     </li>
                     {% include "custom-navlist.html" ignore missing %}
                     {% if is_admin %}
-                        <li><a href="{{ url_for('new_post') }}">Admin</a></li>
+                        <li><a href="{{ url_for('.new_post') }}">Admin</a></li>
                     {% endif %}
                     {% block sidebar %}{% endblock %}
                 </ul>

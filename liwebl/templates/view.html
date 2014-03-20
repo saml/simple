@@ -4,13 +4,13 @@
 
 {% block head %}
     {% if has_audio %}
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sm2.css')}}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('.static', filename='css/sm2.css')}}" />
     {% endif %}
 {% endblock %}
 
 {% block sidebar %}
     {% if is_admin %}
-        <li><a  href="{{ url_for('edit', post_id=post.id) }}">Edit post</a></li>
+        <li><a  href="{{ url_for('.edit', post_id=post.id) }}">Edit post</a></li>
     {% endif %}
 {% endblock %}
 

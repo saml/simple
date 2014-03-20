@@ -1,15 +1,15 @@
-from flask import request, Response
+from functools import wraps
+
+from flask import request, Response, current_app
 from werkzeug.security import check_password_hash
 
-from liwebl import app
 
-from functools import wraps
 
 def is_admin():
     authorization = request.authorization
     if authorization and \
-            authorization.username == app.config['ADMIN_USERNAME'] and \
-            check_password_hash(app.config['ADMIN_PASSWORD'], authorization.password):
+            authorization.username == current_app.config['ADMIN_USERNAME'] and \
+            check_password_hash(current_app.config['ADMIN_PASSWORD'], authorization.password):
         return True
     return False
 

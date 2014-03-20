@@ -1,7 +1,7 @@
 Flask==0.10.1
-SQLAlchemy==0.8.2
 Flask-SQLAlchemy==1.0
 Flask-paginate==0.1.5
+Flask-Script==0.6.7
 misaka==1.0.2
 Pygments==1.6
 Unidecode==0.04.13

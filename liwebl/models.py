@@ -1,10 +1,4 @@
-
-import json
-import mimetypes
-
-from liwebl import app, db
-
-from bs4 import BeautifulSoup
+from .extensions import db
 
 class Post(db.Model):
     def __init__(self, title):

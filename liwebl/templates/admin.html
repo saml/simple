@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="index content">
-    <form action="{{ url_for('new_post') }}" method="POST">
+    <form action="{{ url_for('.new_post') }}" method="POST">
         <input class="grid 1of3" name="title" id="post_title" type="text" placeholder="Start typing an idea here">
         <input type="submit" value="New Post" />
     </form>
@@ -14,7 +14,7 @@
             <div class="span12">
                 <section id="post-{{ post.id }}">
                     <div class="post_header">
-                        <h1><a href="{{ url_for('edit', post_id=post.id) }}">{% if post.draft %}[Draft] {% endif %}{{ post.title }}</a></h1>
+                        <h1><a href="{{ url_for('.edit', post_id=post.id) }}">{% if post.draft %}[Draft] {% endif %}{{ post.title }}</a></h1>
                     </div>
                     <p>Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
                 </section>

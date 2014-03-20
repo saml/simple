@@ -1,7 +1,6 @@
 import dateutil.parser
 import pytz
 
-import models
 from utils import current_datetime, full_url_of
 
 

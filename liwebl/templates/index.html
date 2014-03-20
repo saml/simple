@@ -9,7 +9,7 @@
     {% for post in posts %}
         <section id="post-{{ post.id }}">
             <div class="post_header">
-                <h1><a href="{{ url_for('view_post_slug', readable_id=post.readable_id) }}">{{ post.title }}</a></h1>
+                <h1><a href="{{ url_for('.view_post_slug', readable_id=post.readable_id) }}">{{ post.title }}</a></h1>
             </div>
             <p>Posted: {{ post.created_at|datetimeformat('%Y-%m-%d') }}</p>
         </section>

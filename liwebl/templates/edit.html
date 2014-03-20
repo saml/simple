@@ -48,16 +48,16 @@
            
     </form>
     <ul class="nav nav-pills grid 1of1">
-        <li><a href="{{ url_for("new_post") }}">Admin</a></li>
+        <li><a href="{{ url_for('.new_post') }}">Admin</a></li>
         <li>
-            <form method="POST" action="{{ url_for('delete', post_id=post.id, next=url_for('new_post')) }}">
+            <form method="POST" action="{{ url_for('.delete', post_id=post.id, next=url_for('.new_post')) }}">
                 <input class="confirm" type="submit" value="Delete" />
             </form>
         </li>
         <li>{% if post.draft %}
-            <a href="{{ url_for('preview', post_id=post.id) }}" target="previewPage">Preview</a>
+            <a href="{{ url_for('.preview', post_id=post.id) }}" target="previewPage">Preview</a>
         {% else %}
-            <a href="{{  url_for('view_post_slug', readable_id=post.readable_id) }}" target="_blank">View live</a>
+            <a href="{{  url_for('.view_post_slug', readable_id=post.readable_id) }}" target="_blank">View live</a>
         {% endif %}</li>
         <li><button class="btn btn-success" onclick="$('#edit_post').submit()">Save</button></li>
     </ul>
@@ -117,7 +117,7 @@
 
                 }, false);
 
-                xhr.open("POST", "{{ url_for('upload_file') }}");
+                xhr.open("POST", "{{ url_for('.upload_file') }}");
                 xhr.onload = function() {
                     console.log(xhr.responseText);
                     var resp = JSON.parse(xhr.responseText);
@@ -193,7 +193,7 @@
 
                     $.ajax({
                         type: "POST",
-                        url:"{{ url_for('save_post', post_id=post.id) }}",
+                        url:"{{ url_for('.save_post', post_id=post.id) }}",
                         data: $('#edit_post').serialize()
                     });
                 }

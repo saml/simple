@@ -1,13 +1,16 @@
-from liwebl import app, db
-from models import Post
-from utils import current_datetime, get_readable_id, full_url_of
+from flask import current_app
 
-def query_posts_paginated(page=1, draft=None, per_page=app.config['POSTS_PER_PAGE']):
+from .models import Post
+from .utils import current_datetime, get_readable_id, full_url_of
+from .extensions import db
+
+def query_posts_paginated(page=1, draft=None):
     post_query = db.session.query(Post)
     if draft is not None:
         post_query = post_query.filter_by(draft=draft)
     all_posts = post_query.order_by(Post.created_at.desc())
     total = all_posts.count()
+    per_page = current_app.config['POSTS_PER_PAGE']
     query = all_posts.limit(per_page).offset((page - 1) * int(per_page))
     result = query.all()
     return (result, query.count(), total)
