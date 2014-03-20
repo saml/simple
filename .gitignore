@@ -11,3 +11,4 @@ logs/
 templates/custom-*
 tmp/
 build/
+venv/
