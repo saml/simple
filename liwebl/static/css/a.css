@@ -21,12 +21,13 @@ section {
   padding: 0 32px;
 }
 
-.pagination li {
+.pagination li, .nav li {
   display: inline;
   border: 1px solid #ddd;
   padding: 6px 12px;
   margin-left: -1px;
 }
+
 .codehilite .hll { background-color: #ffffcc }
 .codehilite  { background: #f8f8f8; }
 .codehilite .c { color: #408080; font-style: italic } /* Comment */
