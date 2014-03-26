@@ -48,7 +48,7 @@ def markdown_to_html(s):
 
 
 
-def format_datetime(date, format='%Y-%m-%d %I:%m %p %Z'):
+def format_datetime(date, format='%Y-%m-%d %I:%M %p %Z'):
     if not date:
         return ''
     if not date.tzinfo:
