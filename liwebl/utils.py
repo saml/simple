@@ -41,4 +41,6 @@ def refresh_cache(urls):
     current_app.logger.debug(results)
     return results
 
-
+def ensure_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)

@@ -3,6 +3,7 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask
 
+from .utils import ensure_dir
 from .extensions import db
 from .views import bp
 from .renderers import format_datetime, format_iso8601_notz, format_iso8601, render_post
@@ -20,7 +21,10 @@ def create_app(config=None):
 
 
 def configure_logging(app):
-    handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=100*1024*1024, backupCount=5)
+    log_path = app.config['LOG_PATH']
+    ensure_dir(log_path)
+
+    handler = RotatingFileHandler(log_path, maxBytes=100*1024*1024, backupCount=5)
     formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
     handler.setFormatter(formatter)
     level = getattr(logging, app.config['LOG_LEVEL'])
