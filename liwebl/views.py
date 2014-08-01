@@ -4,6 +4,7 @@ import json
 from flask import render_template, Blueprint, current_app, request, flash, redirect, url_for
 from flask import abort, jsonify,  make_response, send_from_directory
 from flask_paginate import Pagination
+from werkzeug.http import http_date
 
 
 from .auth import requires_authentication, is_admin
@@ -32,7 +33,7 @@ def view_post_slug(readable_id):
     post = contents.get_post(readable_id, draft=False)
     if post is None:
         return abort(404)
-    return render_template("view.html", post=post, is_admin=is_admin())
+    return render_template("view.html", post=post, is_admin=is_admin()),200,{'Last-Modified': http_date(post.updated_at)}
 
 
 @bp.route("/admin/posts", methods=["GET", "POST"])
