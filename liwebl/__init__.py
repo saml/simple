@@ -18,8 +18,16 @@ def create_app(config=None):
     configure_extensions(app)
     configure_templates(app)
 
+    logger = app.logger
+    log_config(logger, app.config, 'LOG_PATH')
+    log_config(logger, app.config, 'SQLALCHEMY_DATABASE_URI')
+    log_config(logger, app.config, 'BLOG_URL')
+    log_config(logger, app.config, 'CACHE_FLUSH_COMMAND')
+
     return app
 
+def log_config(logger, config, key):
+    logger.info('%s = %s', key, config[key])
 
 def configure_logging(app):
     log_path = app.config['LOG_PATH']
