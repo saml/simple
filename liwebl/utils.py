@@ -30,10 +30,10 @@ def get_readable_id(publish_date, title):
 
 def refresh_cache(urls):
     results = []
-    dryrun = current_app.config['CACHE_FLUSH_COMMAND']
-    if not dryrun:
+    flush_cmd = current_app.config['CACHE_FLUSH_COMMAND']
+    if flush_cmd:
         for url in urls:
-            command = [current_app.config['CACHE_FLUSH_COMMAND'], url]
+            command = [flush_cmd, url]
             current_app.logger.debug(command)
             p = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
             out,err = p.communicate()
