@@ -1,5 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
+import os
 
 from flask import Flask
 
@@ -22,7 +23,7 @@ def create_app(config=None):
 
 def configure_logging(app):
     log_path = app.config['LOG_PATH']
-    ensure_dir(log_path)
+    ensure_dir(os.path.dirname(log_path))
 
     handler = RotatingFileHandler(log_path, maxBytes=100*1024*1024, backupCount=5)
     formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
